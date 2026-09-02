@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Tareas del Equipo</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --primary: #2563eb;
+      --text: #1f2937;
+      --border: #e5e7eb;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 { text-align: center; margin-bottom: 24px; }
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+    }
+    .form-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 10px;
+    }
+    input, select, button {
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { opacity: 0.9; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li {
+      background: var(--card);
+      padding: 14px 20px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .task-info { display: flex; align-items: center; gap: 12px; }
+    .task-title { font-weight: 500; }
+    .completed .task-title {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+    .badge {
+      font-size: 12px;
+      padding: 4px 8px;
+      background: #e0e7ff;
+      color: #3730a3;
+      border-radius: 12px;
+    }
+    .date { font-size: 13px; color: #6b7280; }
+    .read-only-msg {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Tareas del Equipo</h1>
+
+  <div id="readOnlyBanner" class="read-only-msg" style="display: none;">
+    Modo lectura (no tienes permisos para editar ni marcar tareas).
+  </div>
+
+  <div id="adminPanel" class="card">
+    <h3>Asignar Nueva Tarea</h3>
+    <form id="taskForm" class="form-group">
+      <input type="text" id="taskInput" placeholder="Descripción de la tarea" required>
+      <input type="text" id="memberInput" placeholder="Nombre del integrante" required>
+      <input type="date" id="dateInput" required>
+      <button type="submit">Agregar</button>
+    </form>
+  </div>
+
+  <ul id="taskList"></ul>
+
+  <script>
+    // Detecta si es admin mediante el parámetro URL "?admin=true"
+    const urlParams = new URLSearchParams(window.location.search);
+    const isAdmin = urlParams.get('admin') === 'true';
+
+    const adminPanel = document.getElementById('adminPanel');
+    const readOnlyBanner = document.getElementById('readOnlyBanner');
+    const taskForm = document.getElementById('taskForm');
+    const taskList = document.getElementById('taskList');
+
+    // Configuración de permisos de vista
+    if (!isAdmin) {
+      adminPanel.style.display = 'none';
+      readOnlyBanner.style.display = 'block';
+    }
+
+    // Cargar tareas guardadas
+    let tasks = JSON.parse(localStorage.getItem('team_tasks')) || [];
+
+    function renderTasks() {
+      taskList.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        if (task.completed) li.classList.add('completed');
+
+        li.innerHTML = `
+          <div class="task-info">
+            <span class="task-title">${task.text}</span>
+            <span class="badge">${task.member}</span>
+          </div>
+          <span class="date">Entrega: ${task.date}</span>
+        `;
+
+        // Solo el administrador puede hacer clic para marcar como completada
+        if (isAdmin) {
+          li.style.cursor = 'pointer';
+          li.onclick = () => toggleTask(index);
+        }
+
+        taskList.appendChild(li);
+      });
+    }
+
+    function toggleTask(index) {
+      tasks[index].completed = !tasks[index].completed;
+      saveAndRender();
+    }
+
+    if (isAdmin) {
+      taskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newTask = {
+          text: document.getElementById('taskInput').value,
+          member: document.getElementById('memberInput').value,
+          date: document.getElementById('dateInput').value,
+          completed: false
+        };
+        tasks.push(newTask);
+        saveAndRender();
+        taskForm.reset();
+      });
+    }
+
+    function saveAndRender() {
+      localStorage.setItem('team_tasks', JSON.stringify(tasks));
+      renderTasks();
+    }
+
+    renderTasks();
+  </script>
+</body>
+</html>
