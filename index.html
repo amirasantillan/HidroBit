@@ -3,176 +3,937 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestor de Tareas del Equipo</title>
+  <title>HidroBit — Panel de Gestión del Equipo</title>
   <style>
     :root {
-      --bg: #f4f6f8;
+      --bg: #f3f9f5;
       --card: #ffffff;
-      --primary: #2563eb;
-      --text: #1f2937;
-      --border: #e5e7eb;
+      --primary: #10b981; /* Verde HidroBit */
+      --primary-dark: #059669;
+      --primary-light: #d1fae5;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      /* Estados y Prioridades */
+      --status-pending: #fef3c7;
+      --status-pending-text: #d97706;
+      --status-progress: #e0f2fe;
+      --status-progress-text: #0284c7;
+      --status-completed: #d1fae5;
+      --status-completed-text: #059669;
+      --status-overdue: #fee2e2;
+      --status-overdue-text: #dc2626;
+
+      --priority-high: #ef4444;
+      --priority-medium: #f59e0b;
+      --priority-low: #10b981;
     }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
     body {
-      font-family: system-ui, -apple-system, sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 0 20px;
+      display: flex;
+      min-height: 100vh;
     }
-    h1 { text-align: center; margin-bottom: 24px; }
-    .card {
-      background: var(--card);
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      margin-bottom: 24px;
+
+    /* Layout Principal */
+    .sidebar {
+      width: 250px;
+      background: #ffffff;
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
     }
-    .form-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
+
+    .brand {
+      display: flex;
+      align-items: center;
       gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-dark);
     }
-    input, select, button {
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    button {
-      background-color: var(--primary);
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
+      font-weight: bold;
     }
-    button:hover { opacity: 0.9; }
-    ul { list-style: none; padding: 0; margin: 0; }
-    li {
-      background: var(--card);
-      padding: 14px 20px;
-      border-radius: 6px;
-      margin-bottom: 8px;
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+    }
+
+    /* Header y Bienvenida */
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid var(--border);
-      transition: all 0.2s;
+      margin-bottom: 24px;
     }
-    .task-info { display: flex; align-items: center; gap: 12px; }
-    .task-title { font-weight: 500; }
-    .completed .task-title {
-      text-decoration: line-through;
-      color: #9ca3af;
+
+    .welcome h1 {
+      font-size: 26px;
+      color: var(--text);
     }
-    .badge {
-      font-size: 12px;
-      padding: 4px 8px;
-      background: #e0e7ff;
-      color: #3730a3;
+
+    .welcome p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Cards Métricas */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      padding: 20px;
       border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
-    .date { font-size: 13px; color: #6b7280; }
+
+    .metric-card span {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .metric-card h2 {
+      font-size: 28px;
+      margin-top: 6px;
+      color: var(--text);
+    }
+
+    /* Sección de Filtros y Barra de Progreso */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .section-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    select, input, textarea {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    /* Lista de Tareas */
+    .task-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .task-table th, .task-table td {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .task-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .task-row {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .task-row:hover {
+      background: #f8fafc;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .badge-pending { background: var(--status-pending); color: var(--status-pending-text); }
+    .badge-progress { background: var(--status-progress); color: var(--status-progress-text); }
+    .badge-completed { background: var(--status-completed); color: var(--status-completed-text); }
+    .badge-overdue { background: var(--status-overdue); color: var(--status-overdue-text); }
+
+    .priority-dot {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .p-alta { background: var(--priority-high); }
+    .p-media { background: var(--priority-medium); }
+    .p-baja { background: var(--priority-low); }
+
+    .date-warning {
+      font-size: 11px;
+      display: block;
+      margin-top: 2px;
+    }
+    .text-danger { color: var(--status-overdue-text); font-weight: 600; }
+    .text-warning { color: var(--status-pending-text); font-weight: 600; }
+
+    /* Progreso General */
+    .progress-bar-container {
+      background: var(--bg);
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 12px 0 20px 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .member-progress-item {
+      margin-bottom: 12px;
+    }
+    .member-progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    /* Actividad Reciente */
+    .activity-list {
+      list-style: none;
+    }
+    .activity-item {
+      font-size: 13px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .activity-item strong {
+      color: var(--text);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: white;
+      padding: 28px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .comments-section {
+      margin-top: 20px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .comment-box {
+      background: var(--bg);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    /* Banner Read-Only */
     .read-only-msg {
       background: #fef3c7;
       color: #92400e;
-      padding: 10px;
+      padding: 8px 16px;
       border-radius: 6px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    /* Calendario */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
       text-align: center;
-      font-size: 14px;
+      margin-top: 12px;
+    }
+    .calendar-day-header {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--text-muted);
+    }
+    .calendar-day {
+      background: var(--bg);
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      min-height: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .calendar-event {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 10px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      margin-top: 4px;
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   </style>
 </head>
 <body>
 
-  <h1>Tareas del Equipo</h1>
+  <!-- Barra Lateral (Sidebar) -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">H</div>
+      <span>HidroBit</span>
+    </div>
 
-  <div id="readOnlyBanner" class="read-only-msg" style="display: none;">
-    Modo lectura (no tienes permisos para editar ni marcar tareas).
+    <ul class="nav-list">
+      <li class="nav-item active" onclick="showSection('dashboard')">📊 Inicio</li>
+      <li class="nav-item" onclick="showSection('dashboard')">📋 Tareas</li>
+      <li class="nav-item" onclick="showSection('dashboard')">👥 Equipo</li>
+      <li class="nav-item" onclick="showSection('calendarView')">📅 Calendario</li>
+    </ul>
+  </aside>
+
+  <!-- Contenido Principal -->
+  <main class="main-content">
+
+    <div id="readOnlyBanner" class="read-only-msg" style="display: none;">
+      ⚠️ Modo lectura (Agregá <code>?admin=true</code> a la URL para poder agregar, editar o comentar tareas).
+    </div>
+
+    <!-- Encabezado de Bienvenida -->
+    <header class="header">
+      <div class="welcome">
+        <h1>Hola, Amira 👋</h1>
+        <p>Organizá, asigná y seguí el progreso de todas las tareas del equipo.</p>
+      </div>
+      <button id="btnNewTask" class="btn-primary" onclick="openTaskModal()">＋ Nueva tarea</button>
+    </header>
+
+    <!-- 1. Tarjetas Métricas Principales -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <span>Tareas Totales</span>
+        <h2 id="mTotal">0</h2>
+      </div>
+      <div class="metric-card">
+        <span>Pendientes</span>
+        <h2 id="mPending">0</h2>
+      </div>
+      <div class="metric-card">
+        <span>Completadas</span>
+        <h2 id="mCompleted">0</h2>
+      </div>
+      <div class="metric-card">
+        <span>Vencidas</span>
+        <h2 id="mOverdue" style="color: var(--status-overdue-text);">0</h2>
+      </div>
+    </section>
+
+    <!-- Vista de Dashboard Principal -->
+    <div id="dashboardSection" class="dashboard-grid">
+      
+      <!-- Columna Izquierda: Tabla de Tareas -->
+      <div>
+        <div class="section-card">
+          <div class="section-header">
+            <h3>Lista de Tareas</h3>
+            <!-- 2. Filtro de Tareas por Integrante -->
+            <div class="filter-group">
+              <label for="memberFilter">Mostrar de:</label>
+              <select id="memberFilter" onchange="renderTasks()">
+                <option value="Todos">Todos</option>
+                <option value="Amira">Amira</option>
+                <option value="Sofía">Sofía</option>
+                <option value="Juan">Juan</option>
+                <option value="Lucas">Lucas</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 3 & 7. Tabla con Estado y Prioridad -->
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th>Tarea</th>
+                <th>Integrante</th>
+                <th>Entrega</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="taskTableBody">
+              <!-- Renderizado dinámico -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Progreso y Actividad -->
+      <div>
+        <!-- 5. Progreso del Equipo -->
+        <div class="section-card">
+          <h3>Progreso General</h3>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="overallProgressBar"></div>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;" id="overallProgressText">0% completado</p>
+
+          <h4 style="font-size: 14px; margin-bottom: 12px;">Por Integrante:</h4>
+          <div id="membersProgressList">
+            <!-- Renderizado dinámico -->
+          </div>
+        </div>
+
+        <!-- 9. Sección de Actividad Reciente -->
+        <div class="section-card">
+          <h3>Actividad Reciente</h3>
+          <ul class="activity-list" id="activityList">
+            <!-- Renderizado dinámico -->
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Vista de Calendario (Oculta por defecto) -->
+    <div id="calendarSection" class="section-card" style="display: none;">
+      <h3>Calendario de Entregas</h3>
+      <div class="calendar-grid">
+        <div class="calendar-day-header">Dom</div>
+        <div class="calendar-day-header">Lun</div>
+        <div class="calendar-day-header">Mar</div>
+        <div class="calendar-day-header">Mié</div>
+        <div class="calendar-day-header">Jue</div>
+        <div class="calendar-day-header">Vie</div>
+        <div class="calendar-day-header">Sáb</div>
+      </div>
+      <div class="calendar-grid" id="calendarDays">
+        <!-- Renderizado dinámico de días -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 6. Modal Crear Tarea -->
+  <div class="modal" id="taskModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Nueva Tarea</h3>
+        <button onclick="closeTaskModal()" style="border:none; background:none; cursor:pointer; font-size:18px;">✕</button>
+      </div>
+      <form id="taskForm">
+        <div class="form-group">
+          <label>Nombre de la tarea</label>
+          <input type="text" id="taskName" required placeholder="Ej. Diseñar presentación">
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="taskDesc" rows="2" placeholder="Detalles de la tarea..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Asignar a</label>
+            <select id="taskMember">
+              <option value="Amira">Amira</option>
+              <option value="Sofía">Sofía</option>
+              <option value="Juan">Juan</option>
+              <option value="Lucas">Lucas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Fecha de entrega</label>
+            <input type="date" id="taskDate" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Prioridad</label>
+            <select id="taskPriority">
+              <option value="Baja">Baja</option>
+              <option value="Media">Media</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Estado</label>
+            <select id="taskStatus">
+              <option value="Pendiente">Pendiente</option>
+              <option value="En progreso">En progreso</option>
+              <option value="Completada">Completada</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 12px;">Guardar Tarea</button>
+      </form>
+    </div>
   </div>
 
-  <div id="adminPanel" class="card">
-    <h3>Asignar Nueva Tarea</h3>
-    <form id="taskForm" class="form-group">
-      <input type="text" id="taskInput" placeholder="Descripción de la tarea" required>
-      <input type="text" id="memberInput" placeholder="Nombre del integrante" required>
-      <input type="date" id="dateInput" required>
-      <button type="submit">Agregar</button>
-    </form>
-  </div>
+  <!-- 8. Modal Detalle y Comentarios de Tarea -->
+  <div class="modal" id="detailModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="dTitle">Detalle de la Tarea</h3>
+        <button onclick="closeDetailModal()" style="border:none; background:none; cursor:pointer; font-size:18px;">✕</button>
+      </div>
+      <div>
+        <p style="font-size: 14px; margin-bottom: 8px;" id="dDesc">Sin descripción</p>
+        <p style="font-size: 13px; color: var(--text-muted);"><strong>Responsable:</strong> <span id="dMember"></span></p>
+        <p style="font-size: 13px; color: var(--text-muted);"><strong>Entrega:</strong> <span id="dDate"></span></p>
+        <p style="font-size: 13px; color: var(--text-muted);"><strong>Prioridad:</strong> <span id="dPriority"></span></p>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Estado:</strong> 
+          <select id="dStatusSelect" onchange="updateTaskStatusFromModal()" style="margin-left: 6px; padding: 4px;">
+            <option value="Pendiente">Pendiente</option>
+            <option value="En progreso">En progreso</option>
+            <option value="Completada">Completada</option>
+          </select>
+        </p>
 
-  <ul id="taskList"></ul>
+        <!-- 8. Comentarios -->
+        <div class="comments-section">
+          <h4 style="font-size: 14px; margin-bottom: 10px;">Comentarios</h4>
+          <div id="commentsList"></div>
+          
+          <div id="commentInputGroup" style="display: flex; gap: 8px; margin-top: 10px;">
+            <input type="text" id="newCommentText" placeholder="Escribí un comentario..." style="flex: 1;">
+            <button class="btn-primary" onclick="addComment()" style="padding: 6px 12px;">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // Detecta si es admin mediante el parámetro URL "?admin=true"
+    // Detección de Permisos Admin por URL (?admin=true)
     const urlParams = new URLSearchParams(window.location.search);
     const isAdmin = urlParams.get('admin') === 'true';
 
-    const adminPanel = document.getElementById('adminPanel');
-    const readOnlyBanner = document.getElementById('readOnlyBanner');
-    const taskForm = document.getElementById('taskForm');
-    const taskList = document.getElementById('taskList');
-
-    // Configuración de permisos de vista
     if (!isAdmin) {
-      adminPanel.style.display = 'none';
-      readOnlyBanner.style.display = 'block';
+      document.getElementById('readOnlyBanner').style.display = 'block';
+      document.getElementById('btnNewTask').style.display = 'none';
+      document.getElementById('commentInputGroup').style.display = 'none';
+      document.getElementById('dStatusSelect').disabled = true;
     }
 
-    // Cargar tareas guardadas
-    let tasks = JSON.parse(localStorage.getItem('team_tasks')) || [];
+    // Carga Inicial de Datos o Datos de Ejemplo por defecto
+    const defaultTasks = [
+      { id: 1, text: "Diseñar presentación", member: "Sofía", date: "2026-09-05", status: "Pendiente", priority: "Alta", desc: "Preparar diapositivas 1-5.", comments: [{user: "Amira", text: "Acordate de agregar las fotos del prototipo."}] },
+      { id: 2, text: "Investigar sensores", member: "Juan", date: "2026-09-03", status: "En progreso", priority: "Media", desc: "Ver especificaciones técnicas.", comments: [] },
+      { id: 3, text: "Comprar componentes", member: "Amira", date: "2026-09-02", status: "Completada", priority: "Baja", desc: "Módulos y resistencias.", comments: [] }
+    ];
 
-    function renderTasks() {
-      taskList.innerHTML = '';
-      tasks.forEach((task, index) => {
-        const li = document.createElement('li');
-        if (task.completed) li.classList.add('completed');
+    let tasks = JSON.parse(localStorage.getItem('hidrobit_tasks')) || defaultTasks;
+    let activities = JSON.parse(localStorage.getItem('hidrobit_activities')) || [
+      "Amira creó la tarea Comprar componentes",
+      "Sofía comenzó Diseñar presentación"
+    ];
+    let selectedTaskId = null;
 
-        li.innerHTML = `
-          <div class="task-info">
-            <span class="task-title">${task.text}</span>
-            <span class="badge">${task.member}</span>
-          </div>
-          <span class="date">Entrega: ${task.date}</span>
-        `;
-
-        // Solo el administrador puede hacer clic para marcar como completada
-        if (isAdmin) {
-          li.style.cursor = 'pointer';
-          li.onclick = () => toggleTask(index);
-        }
-
-        taskList.appendChild(li);
-      });
-    }
-
-    function toggleTask(index) {
-      tasks[index].completed = !tasks[index].completed;
-      saveAndRender();
-    }
-
-    if (isAdmin) {
-      taskForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const newTask = {
-          text: document.getElementById('taskInput').value,
-          member: document.getElementById('memberInput').value,
-          date: document.getElementById('dateInput').value,
-          completed: false
-        };
-        tasks.push(newTask);
-        saveAndRender();
-        taskForm.reset();
-      });
+    // Métricas y Renderizado Principal
+    function render() {
+      renderMetrics();
+      renderTasks();
+      renderProgress();
+      renderActivities();
+      renderCalendar();
     }
 
     function saveAndRender() {
-      localStorage.setItem('team_tasks', JSON.stringify(tasks));
-      renderTasks();
+      localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
+      localStorage.setItem('hidrobit_activities', JSON.stringify(activities));
+      render();
     }
 
-    renderTasks();
+    // 4. Lógica de cálculo de Fechas y Avisos
+    function getDateWarning(dateStr, status) {
+      if (status === "Completada") return "";
+      
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const targetDate = new Date(dateStr + "T00:00:00");
+      const diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) return `<span class="date-warning text-danger">⚠️ Vencida</span>`;
+      if (diffDays === 0) return `<span class="date-warning text-danger">⚠️ Vence hoy</span>`;
+      if (diffDays <= 3) return `<span class="date-warning text-warning">⏱️ Faltan ${diffDays} días</span>`;
+      return `<span class="date-warning" style="color:var(--text-muted)">Faltan más de 3 días</span>`;
+    }
+
+    function getCalculatedStatus(task) {
+      if (task.status === "Completada") return "Completada";
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const targetDate = new Date(task.date + "T00:00:00");
+      if (targetDate < today) return "Vencida";
+      return task.status;
+    }
+
+    // 1. Tarjetas Métricas
+    function renderMetrics() {
+      const total = tasks.length;
+      let pending = 0, completed = 0, overdue = 0;
+
+      tasks.forEach(t => {
+        const st = getCalculatedStatus(t);
+        if (st === "Completada") completed++;
+        else if (st === "Vencida") overdue++;
+        else pending++;
+      });
+
+      document.getElementById('mTotal').innerText = total;
+      document.getElementById('mPending').innerText = pending;
+      document.getElementById('mCompleted').innerText = completed;
+      document.getElementById('mOverdue').innerText = overdue;
+    }
+
+    // 2 & 3. Renderizar Lista de Tareas
+    function renderTasks() {
+      const tbody = document.getElementById('taskTableBody');
+      const filter = document.getElementById('memberFilter').value;
+      tbody.innerHTML = '';
+
+      const filteredTasks = filter === "Todos" ? tasks : tasks.filter(t => t.member === filter);
+
+      filteredTasks.forEach(task => {
+        const currentStatus = getCalculatedStatus(task);
+        const tr = document.createElement('tr');
+        tr.className = "task-row";
+        tr.onclick = () => openDetailModal(task.id);
+
+        let badgeClass = "badge-pending";
+        if (currentStatus === "En progreso") badgeClass = "badge-progress";
+        if (currentStatus === "Completada") badgeClass = "badge-completed";
+        if (currentStatus === "Vencida") badgeClass = "badge-overdue";
+
+        let priorityClass = task.priority === "Alta" ? "p-alta" : (task.priority === "Media" ? "p-media" : "p-baja");
+
+        tr.innerHTML = `
+          <td>
+            <span class="priority-dot ${priorityClass}"></span>
+            <strong>${task.text}</strong>
+          </td>
+          <td>${task.member}</td>
+          <td>
+            ${task.date.split('-').reverse().slice(0,2).join('/')}
+            ${getDateWarning(task.date, currentStatus)}
+          </td>
+          <td><span class="badge ${badgeClass}">${currentStatus}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 5. Progreso del Equipo
+    function renderProgress() {
+      const completedCount = tasks.filter(t => t.status === "Completada").length;
+      const totalCount = tasks.length;
+      const overallPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+      document.getElementById('overallProgressBar').style.width = `${overallPercent}%`;
+      document.getElementById('overallProgressText').innerText = `${overallPercent}% completado del total`;
+
+      const members = ["Amira", "Sofía", "Juan", "Lucas"];
+      const container = document.getElementById('membersProgressList');
+      container.innerHTML = '';
+
+      members.forEach(m => {
+        const mTasks = tasks.filter(t => t.member === m);
+        const mDone = mTasks.filter(t => t.status === "Completada").length;
+        const percent = mTasks.length > 0 ? Math.round((mDone / mTasks.length) * 100) : 0;
+
+        container.innerHTML += `
+          <div class="member-progress-item">
+            <div class="member-progress-info">
+              <span>${m}</span>
+              <strong>${percent}%</strong>
+            </div>
+            <div class="progress-bar-container" style="height:6px; margin:0;">
+              <div class="progress-bar" style="width: ${percent}%;"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // 9. Actividad Reciente
+    function renderActivities() {
+      const list = document.getElementById('activityList');
+      list.innerHTML = '';
+      activities.slice(-5).reverse().forEach(act => {
+        list.innerHTML += `<li class="activity-item">${act}</li>`;
+      });
+    }
+
+    function addActivity(text) {
+      activities.push(text);
+    }
+
+    // Modal Crear Tarea
+    function openTaskModal() {
+      document.getElementById('taskModal').classList.add('active');
+    }
+    function closeTaskModal() {
+      document.getElementById('taskModal').classList.remove('active');
+    }
+
+    document.getElementById('taskForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newTask = {
+        id: Date.now(),
+        text: document.getElementById('taskName').value,
+        desc: document.getElementById('taskDesc').value,
+        member: document.getElementById('taskMember').value,
+        date: document.getElementById('taskDate').value,
+        priority: document.getElementById('taskPriority').value,
+        status: document.getElementById('taskStatus').value,
+        comments: []
+      };
+
+      tasks.push(newTask);
+      addActivity(`Se agregó la tarea: <strong>${newTask.text}</strong> a ${newTask.member}`);
+      saveAndRender();
+      closeTaskModal();
+      document.getElementById('taskForm').reset();
+    });
+
+    // Modal Detalle & Comentarios
+    function openDetailModal(id) {
+      selectedTaskId = id;
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      document.getElementById('dTitle').innerText = task.text;
+      document.getElementById('dDesc').innerText = task.desc || "Sin descripción.";
+      document.getElementById('dMember').innerText = task.member;
+      document.getElementById('dDate').innerText = task.date;
+      document.getElementById('dPriority').innerText = task.priority;
+      document.getElementById('dStatusSelect').value = task.status;
+
+      renderComments(task);
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.remove('active');
+    }
+
+    function renderComments(task) {
+      const cList = document.getElementById('commentsList');
+      cList.innerHTML = '';
+      if (!task.comments || task.comments.length === 0) {
+        cList.innerHTML = `<p style="font-size:12px; color:var(--text-muted)">No hay comentarios aún.</p>`;
+        return;
+      }
+      task.comments.forEach(c => {
+        cList.innerHTML += `
+          <div class="comment-box">
+            <strong>${c.user}:</strong> ${c.text}
+          </div>
+        `;
+      });
+    }
+
+    function addComment() {
+      const textInput = document.getElementById('newCommentText');
+      if (!textInput.value.trim() || !selectedTaskId) return;
+
+      const task = tasks.find(t => t.id === selectedTaskId);
+      if (task) {
+        if (!task.comments) task.comments = [];
+        task.comments.push({ user: "Amira", text: textInput.value });
+        addActivity(`Amira comentó en <strong>${task.text}</strong>`);
+        textInput.value = '';
+        saveAndRender();
+        renderComments(task);
+      }
+    }
+
+    function updateTaskStatusFromModal() {
+      if (!isAdmin || !selectedTaskId) return;
+      const newStatus = document.getElementById('dStatusSelect').value;
+      const task = tasks.find(t => t.id === selectedTaskId);
+      if (task) {
+        task.status = newStatus;
+        addActivity(`Estado de <strong>${task.text}</strong> cambiado a ${newStatus}`);
+        saveAndRender();
+      }
+    }
+
+    // Calendario Simple
+    function renderCalendar() {
+      const calendarDays = document.getElementById('calendarDays');
+      calendarDays.innerHTML = '';
+      for (let i = 1; i <= 30; i++) {
+        const dayStr = i < 10 ? `0${i}` : `${i}`;
+        const dayTasks = tasks.filter(t => t.date.endsWith(`-${dayStr}`));
+
+        let tasksHtml = '';
+        dayTasks.forEach(t => {
+          tasksHtml += `<div class="calendar-event" title="${t.text}">${t.text}</div>`;
+        });
+
+        calendarDays.innerHTML += `
+          <div class="calendar-day">
+            <strong>${i}</strong>
+            ${tasksHtml}
+          </div>
+        `;
+      }
+    }
+
+    // Navegación de Secciones
+    function showSection(section) {
+      if (section === 'calendarView') {
+        document.getElementById('dashboardSection').style.display = 'none';
+        document.getElementById('calendarSection').style.display = 'block';
+      } else {
+        document.getElementById('dashboardSection').style.display = 'grid';
+        document.getElementById('calendarSection').style.display = 'none';
+      }
+    }
+
+    // Inicializar
+    render();
   </script>
 </body>
 </html>
