@@ -8,14 +8,13 @@
     :root {
       --bg: #f3f9f5;
       --card: #ffffff;
-      --primary: #10b981; /* Verde HidroBit */
+      --primary: #10b981;
       --primary-dark: #059669;
       --primary-light: #d1fae5;
       --text: #0f172a;
       --text-muted: #64748b;
       --border: #e2e8f0;
       
-      /* Estados y Prioridades */
       --status-pending: #fef3c7;
       --status-pending-text: #d97706;
       --status-progress: #e0f2fe;
@@ -59,21 +58,14 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
       color: var(--primary-dark);
     }
 
-    .brand-icon {
-      width: 32px;
-      height: 32px;
-      background: var(--primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
+    .brand img {
+      width: 45px;
+      height: auto;
     }
 
     .nav-list {
@@ -106,7 +98,6 @@
       overflow-y: auto;
     }
 
-    /* Header y Bienvenida */
     .header {
       display: flex;
       justify-content: space-between;
@@ -143,7 +134,20 @@
       background: var(--primary-dark);
     }
 
-    /* Cards Métricas */
+    .view-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -169,13 +173,6 @@
       font-size: 28px;
       margin-top: 6px;
       color: var(--text);
-    }
-
-    /* Sección de Filtros y Barra de Progreso */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 24px;
     }
 
     .section-card {
@@ -208,7 +205,6 @@
       font-size: 14px;
     }
 
-    /* Lista de Tareas */
     .task-table {
       width: 100%;
       border-collapse: collapse;
@@ -269,7 +265,6 @@
     .text-danger { color: var(--status-overdue-text); font-weight: 600; }
     .text-warning { color: var(--status-pending-text); font-weight: 600; }
 
-    /* Progreso General */
     .progress-bar-container {
       background: var(--bg);
       height: 12px;
@@ -285,9 +280,7 @@
       transition: width 0.4s ease;
     }
 
-    .member-progress-item {
-      margin-bottom: 12px;
-    }
+    .member-progress-item { margin-bottom: 12px; }
     .member-progress-info {
       display: flex;
       justify-content: space-between;
@@ -295,21 +288,15 @@
       margin-bottom: 4px;
     }
 
-    /* Actividad Reciente */
-    .activity-list {
-      list-style: none;
-    }
+    .activity-list { list-style: none; }
     .activity-item {
       font-size: 13px;
       padding: 10px 0;
       border-bottom: 1px solid var(--border);
       color: var(--text-muted);
     }
-    .activity-item strong {
-      color: var(--text);
-    }
+    .activity-item strong { color: var(--text); }
 
-    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -319,7 +306,6 @@
       justify-content: center;
       z-index: 100;
     }
-
     .modal.active { display: flex; }
 
     .modal-content {
@@ -330,39 +316,30 @@
       max-width: 500px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
-
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
-
     .form-group {
       margin-bottom: 16px;
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
-
     .form-group label {
       font-size: 13px;
       font-weight: 600;
       color: var(--text-muted);
     }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
     .comments-section {
       margin-top: 20px;
       border-top: 1px solid var(--border);
       padding-top: 16px;
     }
-
     .comment-box {
       background: var(--bg);
       padding: 10px;
@@ -371,17 +348,12 @@
       margin-bottom: 8px;
     }
 
-    /* Banner Read-Only */
-    .read-only-msg {
-      background: #fef3c7;
-      color: #92400e;
-      padding: 8px 16px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      font-size: 13px;
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
     }
-
-    /* Calendario */
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -399,19 +371,26 @@
       padding: 8px;
       border-radius: 6px;
       font-size: 12px;
-      min-height: 48px;
+      min-height: 80px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      border: 1px solid transparent;
     }
+    .calendar-day.empty { background: transparent; }
+    .calendar-day.today { border-color: var(--primary); background: var(--primary-light); }
+    
     .calendar-event {
-      background: var(--primary-light);
+      background: var(--card);
       color: var(--primary-dark);
       font-size: 10px;
-      padding: 2px 4px;
+      padding: 4px;
       border-radius: 4px;
       margin-top: 4px;
       width: 100%;
+      border: 1px solid var(--primary-light);
+      cursor: pointer;
+      text-align: left;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -420,142 +399,116 @@
 </head>
 <body>
 
-  <!-- Barra Lateral (Sidebar) -->
+  <!-- Barra Lateral -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-icon">H</div>
+      <img src="63915-removebg-preview.png" alt="HidroBit Logo">
       <span>HidroBit</span>
     </div>
 
     <ul class="nav-list">
-      <li class="nav-item active" onclick="showSection('dashboard')">📊 Inicio</li>
-      <li class="nav-item" onclick="showSection('dashboard')">📋 Tareas</li>
-      <li class="nav-item" onclick="showSection('dashboard')">👥 Equipo</li>
-      <li class="nav-item" onclick="showSection('calendarView')">📅 Calendario</li>
+      <li class="nav-item active" onclick="switchTab('inicioSection', this)">📊 Inicio</li>
+      <li class="nav-item" onclick="switchTab('tasksSection', this)">📋 Tareas</li>
+      <li class="nav-item" onclick="switchTab('teamSection', this)">👥 Equipo</li>
+      <li class="nav-item" onclick="switchTab('calendarSection', this)">📅 Calendario</li>
     </ul>
   </aside>
 
   <!-- Contenido Principal -->
   <main class="main-content">
-
-    <div id="readOnlyBanner" class="read-only-msg" style="display: none;">
-      ⚠️ Modo lectura (Agregá <code>?admin=true</code> a la URL para poder agregar, editar o comentar tareas).
-    </div>
-
-    <!-- Encabezado de Bienvenida -->
+    
+    <!-- Encabezado -->
     <header class="header">
       <div class="welcome">
-        <h1>Hola, Amira 👋</h1>
-        <p>Organizá, asigná y seguí el progreso de todas las tareas del equipo.</p>
+        <h1>Gestión del Equipo</h1>
+        <p>Organizá, asigná y seguí el progreso de todas las tareas.</p>
       </div>
       <button id="btnNewTask" class="btn-primary" onclick="openTaskModal()">＋ Nueva tarea</button>
     </header>
 
-    <!-- 1. Tarjetas Métricas Principales -->
-    <section class="metrics-grid">
-      <div class="metric-card">
-        <span>Tareas Totales</span>
-        <h2 id="mTotal">0</h2>
+    <!-- VISTA INICIO (Métricas y Actividad) -->
+    <section id="inicioSection" class="view-section active">
+      <div class="metrics-grid">
+        <div class="metric-card"><span>Tareas Totales</span><h2 id="mTotal">0</h2></div>
+        <div class="metric-card"><span>Pendientes</span><h2 id="mPending">0</h2></div>
+        <div class="metric-card"><span>Completadas</span><h2 id="mCompleted">0</h2></div>
+        <div class="metric-card"><span>Vencidas</span><h2 id="mOverdue" style="color: var(--status-overdue-text);">0</h2></div>
       </div>
-      <div class="metric-card">
-        <span>Pendientes</span>
-        <h2 id="mPending">0</h2>
-      </div>
-      <div class="metric-card">
-        <span>Completadas</span>
-        <h2 id="mCompleted">0</h2>
-      </div>
-      <div class="metric-card">
-        <span>Vencidas</span>
-        <h2 id="mOverdue" style="color: var(--status-overdue-text);">0</h2>
+      <div class="section-card">
+        <h3>Actividad Reciente</h3>
+        <ul class="activity-list" id="activityList"></ul>
       </div>
     </section>
 
-    <!-- Vista de Dashboard Principal -->
-    <div id="dashboardSection" class="dashboard-grid">
-      
-      <!-- Columna Izquierda: Tabla de Tareas -->
-      <div>
-        <div class="section-card">
-          <div class="section-header">
-            <h3>Lista de Tareas</h3>
-            <!-- 2. Filtro de Tareas por Integrante -->
-            <div class="filter-group">
-              <label for="memberFilter">Mostrar de:</label>
-              <select id="memberFilter" onchange="renderTasks()">
-                <option value="Todos">Todos</option>
-                <option value="Amira">Amira</option>
-                <option value="Sofía">Sofía</option>
-                <option value="Juan">Juan</option>
-                <option value="Lucas">Lucas</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- 3 & 7. Tabla con Estado y Prioridad -->
-          <table class="task-table">
-            <thead>
-              <tr>
-                <th>Tarea</th>
-                <th>Integrante</th>
-                <th>Entrega</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody id="taskTableBody">
-              <!-- Renderizado dinámico -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Columna Derecha: Progreso y Actividad -->
-      <div>
-        <!-- 5. Progreso del Equipo -->
-        <div class="section-card">
-          <h3>Progreso General</h3>
-          <div class="progress-bar-container">
-            <div class="progress-bar" id="overallProgressBar"></div>
-          </div>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;" id="overallProgressText">0% completado</p>
-
-          <h4 style="font-size: 14px; margin-bottom: 12px;">Por Integrante:</h4>
-          <div id="membersProgressList">
-            <!-- Renderizado dinámico -->
+    <!-- VISTA TAREAS -->
+    <section id="tasksSection" class="view-section">
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Lista de Tareas</h3>
+          <div class="filter-group">
+            <label for="memberFilter">Mostrar de:</label>
+            <select id="memberFilter" onchange="renderTasks()">
+              <option value="Todos">Todos</option>
+              <option value="Amira">Amira</option>
+              <option value="Joaquín">Joaquín</option>
+              <option value="Nacho">Nacho</option>
+              <option value="Felipe">Felipe</option>
+              <option value="Agustín">Agustín</option>
+            </select>
           </div>
         </div>
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th>Tarea</th>
+              <th>Integrante</th>
+              <th>Entrega</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="taskTableBody"></tbody>
+        </table>
+      </div>
+    </section>
 
-        <!-- 9. Sección de Actividad Reciente -->
-        <div class="section-card">
-          <h3>Actividad Reciente</h3>
-          <ul class="activity-list" id="activityList">
-            <!-- Renderizado dinámico -->
-          </ul>
+    <!-- VISTA EQUIPO (Progreso) -->
+    <section id="teamSection" class="view-section">
+      <div class="section-card">
+        <h3>Progreso General</h3>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="overallProgressBar"></div>
         </div>
-      </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;" id="overallProgressText">0% completado</p>
 
-    </div>
+        <h4 style="font-size: 16px; margin-bottom: 16px;">Progreso por Integrante:</h4>
+        <div id="membersProgressList"></div>
+      </div>
+    </section>
 
-    <!-- Vista de Calendario (Oculta por defecto) -->
-    <div id="calendarSection" class="section-card" style="display: none;">
-      <h3>Calendario de Entregas</h3>
-      <div class="calendar-grid">
-        <div class="calendar-day-header">Dom</div>
-        <div class="calendar-day-header">Lun</div>
-        <div class="calendar-day-header">Mar</div>
-        <div class="calendar-day-header">Mié</div>
-        <div class="calendar-day-header">Jue</div>
-        <div class="calendar-day-header">Vie</div>
-        <div class="calendar-day-header">Sáb</div>
+    <!-- VISTA CALENDARIO -->
+    <section id="calendarSection" class="view-section">
+      <div class="section-card">
+        <div class="calendar-controls">
+          <h3 id="calendarDisplayMonth" style="margin: 0; min-width: 180px;">Mes</h3>
+          <input type="month" id="calendarMonthPicker" onchange="changeCalendarMonth(event)" style="display: none;">
+        </div>
+        
+        <div class="calendar-grid">
+          <div class="calendar-day-header">Dom</div>
+          <div class="calendar-day-header">Lun</div>
+          <div class="calendar-day-header">Mar</div>
+          <div class="calendar-day-header">Mié</div>
+          <div class="calendar-day-header">Jue</div>
+          <div class="calendar-day-header">Vie</div>
+          <div class="calendar-day-header">Sáb</div>
+        </div>
+        <div class="calendar-grid" id="calendarDays"></div>
       </div>
-      <div class="calendar-grid" id="calendarDays">
-        <!-- Renderizado dinámico de días -->
-      </div>
-    </div>
+    </section>
 
   </main>
 
-  <!-- 6. Modal Crear Tarea -->
+  <!-- Modal Crear Tarea -->
   <div class="modal" id="taskModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -565,7 +518,7 @@
       <form id="taskForm">
         <div class="form-group">
           <label>Nombre de la tarea</label>
-          <input type="text" id="taskName" required placeholder="Ej. Diseñar presentación">
+          <input type="text" id="taskName" required placeholder="Ej. Diseñar prototipo">
         </div>
         <div class="form-group">
           <label>Descripción</label>
@@ -576,9 +529,10 @@
             <label>Asignar a</label>
             <select id="taskMember">
               <option value="Amira">Amira</option>
-              <option value="Sofía">Sofía</option>
-              <option value="Juan">Juan</option>
-              <option value="Lucas">Lucas</option>
+              <option value="Joaquín">Joaquín</option>
+              <option value="Nacho">Nacho</option>
+              <option value="Felipe">Felipe</option>
+              <option value="Agustín">Agustín</option>
             </select>
           </div>
           <div class="form-group">
@@ -609,7 +563,7 @@
     </div>
   </div>
 
-  <!-- 8. Modal Detalle y Comentarios de Tarea -->
+  <!-- Modal Detalle y Comentarios -->
   <div class="modal" id="detailModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -617,7 +571,7 @@
         <button onclick="closeDetailModal()" style="border:none; background:none; cursor:pointer; font-size:18px;">✕</button>
       </div>
       <div>
-        <p style="font-size: 14px; margin-bottom: 8px;" id="dDesc">Sin descripción</p>
+        <p style="font-size: 14px; margin-bottom: 8px;" id="dDesc"></p>
         <p style="font-size: 13px; color: var(--text-muted);"><strong>Responsable:</strong> <span id="dMember"></span></p>
         <p style="font-size: 13px; color: var(--text-muted);"><strong>Entrega:</strong> <span id="dDate"></span></p>
         <p style="font-size: 13px; color: var(--text-muted);"><strong>Prioridad:</strong> <span id="dPriority"></span></p>
@@ -629,11 +583,9 @@
           </select>
         </p>
 
-        <!-- 8. Comentarios -->
         <div class="comments-section">
           <h4 style="font-size: 14px; margin-bottom: 10px;">Comentarios</h4>
           <div id="commentsList"></div>
-          
           <div id="commentInputGroup" style="display: flex; gap: 8px; margin-top: 10px;">
             <input type="text" id="newCommentText" placeholder="Escribí un comentario..." style="flex: 1;">
             <button class="btn-primary" onclick="addComment()" style="padding: 6px 12px;">Enviar</button>
@@ -644,54 +596,60 @@
   </div>
 
   <script>
-    // Detección de Permisos Admin por URL (?admin=true)
+    // Detección de Permisos Admin
     const urlParams = new URLSearchParams(window.location.search);
     const isAdmin = urlParams.get('admin') === 'true';
+    const teamMembers = ["Amira", "Joaquín", "Nacho", "Felipe", "Agustín"];
 
+    // Configuración UI según permisos
     if (!isAdmin) {
-      document.getElementById('readOnlyBanner').style.display = 'block';
       document.getElementById('btnNewTask').style.display = 'none';
       document.getElementById('commentInputGroup').style.display = 'none';
       document.getElementById('dStatusSelect').disabled = true;
+    } else {
+      document.getElementById('calendarMonthPicker').style.display = 'block';
     }
 
-    // Carga Inicial de Datos o Datos de Ejemplo por defecto
-    const defaultTasks = [
-      { id: 1, text: "Diseñar presentación", member: "Sofía", date: "2026-09-05", status: "Pendiente", priority: "Alta", desc: "Preparar diapositivas 1-5.", comments: [{user: "Amira", text: "Acordate de agregar las fotos del prototipo."}] },
-      { id: 2, text: "Investigar sensores", member: "Juan", date: "2026-09-03", status: "En progreso", priority: "Media", desc: "Ver especificaciones técnicas.", comments: [] },
-      { id: 3, text: "Comprar componentes", member: "Amira", date: "2026-09-02", status: "Completada", priority: "Baja", desc: "Módulos y resistencias.", comments: [] }
-    ];
+    // Configuración del Calendario
+    const today = new Date();
+    let selectedCalendarMonth = localStorage.getItem('hidrobit_cal_month') || `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+    document.getElementById('calendarMonthPicker').value = selectedCalendarMonth;
 
-    let tasks = JSON.parse(localStorage.getItem('hidrobit_tasks')) || defaultTasks;
-    let activities = JSON.parse(localStorage.getItem('hidrobit_activities')) || [
-      "Amira creó la tarea Comprar componentes",
-      "Sofía comenzó Diseñar presentación"
-    ];
+    // Navegación entre vistas
+    function switchTab(sectionId, element) {
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      element.classList.add('active');
+      
+      if(sectionId === 'calendarSection') renderCalendar();
+    }
+
+    let tasks = JSON.parse(localStorage.getItem('hidrobit_tasks')) || [];
+    let activities = JSON.parse(localStorage.getItem('hidrobit_activities')) || [];
     let selectedTaskId = null;
 
-    // Métricas y Renderizado Principal
     function render() {
       renderMetrics();
       renderTasks();
       renderProgress();
       renderActivities();
-      renderCalendar();
     }
 
     function saveAndRender() {
       localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
       localStorage.setItem('hidrobit_activities', JSON.stringify(activities));
       render();
+      if(document.getElementById('calendarSection').classList.contains('active')) renderCalendar();
     }
 
-    // 4. Lógica de cálculo de Fechas y Avisos
     function getDateWarning(dateStr, status) {
       if (status === "Completada") return "";
-      
-      const today = new Date();
-      today.setHours(0,0,0,0);
+      const dToday = new Date();
+      dToday.setHours(0,0,0,0);
       const targetDate = new Date(dateStr + "T00:00:00");
-      const diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+      const diffDays = Math.ceil((targetDate - dToday) / (1000 * 60 * 60 * 24));
 
       if (diffDays < 0) return `<span class="date-warning text-danger">⚠️ Vencida</span>`;
       if (diffDays === 0) return `<span class="date-warning text-danger">⚠️ Vence hoy</span>`;
@@ -701,37 +659,32 @@
 
     function getCalculatedStatus(task) {
       if (task.status === "Completada") return "Completada";
-      const today = new Date();
-      today.setHours(0,0,0,0);
+      const dToday = new Date();
+      dToday.setHours(0,0,0,0);
       const targetDate = new Date(task.date + "T00:00:00");
-      if (targetDate < today) return "Vencida";
+      if (targetDate < dToday) return "Vencida";
       return task.status;
     }
 
-    // 1. Tarjetas Métricas
     function renderMetrics() {
       const total = tasks.length;
       let pending = 0, completed = 0, overdue = 0;
-
       tasks.forEach(t => {
         const st = getCalculatedStatus(t);
         if (st === "Completada") completed++;
         else if (st === "Vencida") overdue++;
         else pending++;
       });
-
       document.getElementById('mTotal').innerText = total;
       document.getElementById('mPending').innerText = pending;
       document.getElementById('mCompleted').innerText = completed;
       document.getElementById('mOverdue').innerText = overdue;
     }
 
-    // 2 & 3. Renderizar Lista de Tareas
     function renderTasks() {
       const tbody = document.getElementById('taskTableBody');
       const filter = document.getElementById('memberFilter').value;
       tbody.innerHTML = '';
-
       const filteredTasks = filter === "Todos" ? tasks : tasks.filter(t => t.member === filter);
 
       filteredTasks.forEach(task => {
@@ -748,22 +701,15 @@
         let priorityClass = task.priority === "Alta" ? "p-alta" : (task.priority === "Media" ? "p-media" : "p-baja");
 
         tr.innerHTML = `
-          <td>
-            <span class="priority-dot ${priorityClass}"></span>
-            <strong>${task.text}</strong>
-          </td>
+          <td><span class="priority-dot ${priorityClass}"></span><strong>${task.text}</strong></td>
           <td>${task.member}</td>
-          <td>
-            ${task.date.split('-').reverse().slice(0,2).join('/')}
-            ${getDateWarning(task.date, currentStatus)}
-          </td>
+          <td>${task.date.split('-').reverse().slice(0,2).join('/')} ${getDateWarning(task.date, currentStatus)}</td>
           <td><span class="badge ${badgeClass}">${currentStatus}</span></td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // 5. Progreso del Equipo
     function renderProgress() {
       const completedCount = tasks.filter(t => t.status === "Completada").length;
       const totalCount = tasks.length;
@@ -772,11 +718,10 @@
       document.getElementById('overallProgressBar').style.width = `${overallPercent}%`;
       document.getElementById('overallProgressText').innerText = `${overallPercent}% completado del total`;
 
-      const members = ["Amira", "Sofía", "Juan", "Lucas"];
       const container = document.getElementById('membersProgressList');
       container.innerHTML = '';
 
-      members.forEach(m => {
+      teamMembers.forEach(m => {
         const mTasks = tasks.filter(t => t.member === m);
         const mDone = mTasks.filter(t => t.status === "Completada").length;
         const percent = mTasks.length > 0 ? Math.round((mDone / mTasks.length) * 100) : 0;
@@ -784,8 +729,7 @@
         container.innerHTML += `
           <div class="member-progress-item">
             <div class="member-progress-info">
-              <span>${m}</span>
-              <strong>${percent}%</strong>
+              <span>${m}</span><strong>${percent}%</strong>
             </div>
             <div class="progress-bar-container" style="height:6px; margin:0;">
               <div class="progress-bar" style="width: ${percent}%;"></div>
@@ -795,11 +739,11 @@
       });
     }
 
-    // 9. Actividad Reciente
     function renderActivities() {
       const list = document.getElementById('activityList');
       list.innerHTML = '';
-      activities.slice(-5).reverse().forEach(act => {
+      if(activities.length === 0) list.innerHTML = `<li class="activity-item">Sin actividad reciente.</li>`;
+      activities.slice(-6).reverse().forEach(act => {
         list.innerHTML += `<li class="activity-item">${act}</li>`;
       });
     }
@@ -808,13 +752,8 @@
       activities.push(text);
     }
 
-    // Modal Crear Tarea
-    function openTaskModal() {
-      document.getElementById('taskModal').classList.add('active');
-    }
-    function closeTaskModal() {
-      document.getElementById('taskModal').classList.remove('active');
-    }
+    function openTaskModal() { document.getElementById('taskModal').classList.add('active'); }
+    function closeTaskModal() { document.getElementById('taskModal').classList.remove('active'); }
 
     document.getElementById('taskForm').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -828,34 +767,28 @@
         status: document.getElementById('taskStatus').value,
         comments: []
       };
-
       tasks.push(newTask);
-      addActivity(`Se agregó la tarea: <strong>${newTask.text}</strong> a ${newTask.member}`);
+      addActivity(`Se asignó <strong>${newTask.text}</strong> a ${newTask.member}`);
       saveAndRender();
       closeTaskModal();
       document.getElementById('taskForm').reset();
     });
 
-    // Modal Detalle & Comentarios
     function openDetailModal(id) {
       selectedTaskId = id;
       const task = tasks.find(t => t.id === id);
       if (!task) return;
-
       document.getElementById('dTitle').innerText = task.text;
       document.getElementById('dDesc').innerText = task.desc || "Sin descripción.";
       document.getElementById('dMember').innerText = task.member;
       document.getElementById('dDate').innerText = task.date;
       document.getElementById('dPriority').innerText = task.priority;
       document.getElementById('dStatusSelect').value = task.status;
-
       renderComments(task);
       document.getElementById('detailModal').classList.add('active');
     }
 
-    function closeDetailModal() {
-      document.getElementById('detailModal').classList.remove('active');
-    }
+    function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); }
 
     function renderComments(task) {
       const cList = document.getElementById('commentsList');
@@ -865,23 +798,17 @@
         return;
       }
       task.comments.forEach(c => {
-        cList.innerHTML += `
-          <div class="comment-box">
-            <strong>${c.user}:</strong> ${c.text}
-          </div>
-        `;
+        cList.innerHTML += `<div class="comment-box"><strong>${c.user}:</strong> ${c.text}</div>`;
       });
     }
 
     function addComment() {
       const textInput = document.getElementById('newCommentText');
       if (!textInput.value.trim() || !selectedTaskId) return;
-
       const task = tasks.find(t => t.id === selectedTaskId);
       if (task) {
         if (!task.comments) task.comments = [];
         task.comments.push({ user: "Amira", text: textInput.value });
-        addActivity(`Amira comentó en <strong>${task.text}</strong>`);
         textInput.value = '';
         saveAndRender();
         renderComments(task);
@@ -894,41 +821,62 @@
       const task = tasks.find(t => t.id === selectedTaskId);
       if (task) {
         task.status = newStatus;
-        addActivity(`Estado de <strong>${task.text}</strong> cambiado a ${newStatus}`);
+        addActivity(`Estado de <strong>${task.text}</strong> cambió a ${newStatus}`);
         saveAndRender();
       }
     }
 
-    // Calendario Simple
+    // Calendario Lógica Dinámica
+    function changeCalendarMonth(e) {
+      selectedCalendarMonth = e.target.value;
+      localStorage.setItem('hidrobit_cal_month', selectedCalendarMonth);
+      renderCalendar();
+    }
+
     function renderCalendar() {
+      const [year, month] = selectedCalendarMonth.split('-');
+      const date = new Date(year, month - 1, 1);
+      
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      document.getElementById('calendarDisplayMonth').innerText = `${monthNames[date.getMonth()]} ${year}`;
+
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const firstDayIndex = date.getDay(); 
+
       const calendarDays = document.getElementById('calendarDays');
       calendarDays.innerHTML = '';
-      for (let i = 1; i <= 30; i++) {
+
+      // Espacios vacíos antes del primer día
+      for (let i = 0; i < firstDayIndex; i++) {
+        calendarDays.innerHTML += `<div class="calendar-day empty"></div>`;
+      }
+
+      const dToday = new Date();
+      const isCurrentMonthYear = dToday.getFullYear() == year && (dToday.getMonth() + 1) == month;
+
+      // Días del mes
+      for (let i = 1; i <= daysInMonth; i++) {
         const dayStr = i < 10 ? `0${i}` : `${i}`;
-        const dayTasks = tasks.filter(t => t.date.endsWith(`-${dayStr}`));
+        const currentDateStr = `${year}-${month}-${dayStr}`;
+        const dayTasks = tasks.filter(t => t.date === currentDateStr);
+        
+        const isToday = isCurrentMonthYear && dToday.getDate() === i ? 'today' : '';
 
         let tasksHtml = '';
         dayTasks.forEach(t => {
-          tasksHtml += `<div class="calendar-event" title="${t.text}">${t.text}</div>`;
+          let c = "var(--text-muted)";
+          if(t.status === 'Completada') c = "var(--status-completed-text)";
+          if(t.status === 'En progreso') c = "var(--status-progress-text)";
+          
+          tasksHtml += `<div class="calendar-event" onclick="openDetailModal(${t.id})" style="color: ${c}" title="${t.text}">${t.text}</div>`;
         });
 
         calendarDays.innerHTML += `
-          <div class="calendar-day">
+          <div class="calendar-day ${isToday}">
             <strong>${i}</strong>
             ${tasksHtml}
           </div>
         `;
-      }
-    }
-
-    // Navegación de Secciones
-    function showSection(section) {
-      if (section === 'calendarView') {
-        document.getElementById('dashboardSection').style.display = 'none';
-        document.getElementById('calendarSection').style.display = 'block';
-      } else {
-        document.getElementById('dashboardSection').style.display = 'grid';
-        document.getElementById('calendarSection').style.display = 'none';
       }
     }
 
