@@ -1,1 +1,22 @@
-
+[
+  {
+    "id": 1,
+    "text": "Diseño del circuito",
+    "desc": "Revisar conexiones y diagrama",
+    "member": "Amira",
+    "date": "2026-09-10",
+    "priority": "Alta",
+    "status": "En progreso",
+    "comments": []
+  },
+  {
+    "id": 2,
+    "text": "Presentación del proyecto",
+    "desc": "Preparar diapositivas en Canva",
+    "member": "Joaquín",
+    "date": "2026-09-15",
+    "priority": "Media",
+    "status": "Pendiente",
+    "comments": []
+  }
+]
