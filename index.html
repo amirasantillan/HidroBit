@@ -45,7 +45,6 @@
       overflow-x: hidden;
     }
 
-    /* Botón flotante menú hamburguesa */
     .menu-toggle {
       display: none;
       position: fixed;
@@ -65,7 +64,6 @@
       justify-content: center;
     }
 
-    /* Fondo semitransparente para cerrar en móviles */
     .sidebar-overlay {
       display: none;
       position: fixed;
@@ -81,7 +79,6 @@
       display: block;
     }
 
-    /* Layout Barra Lateral */
     .sidebar {
       width: 250px;
       background: #ffffff;
@@ -140,7 +137,6 @@
       width: 100%;
     }
 
-    /* Adaptación para móviles */
     @media (max-width: 768px) {
       .menu-toggle {
         display: flex;
@@ -161,7 +157,6 @@
         transform: translateX(0);
       }
 
-      /* Alinea el logo y el texto a la derecha del botón en móvil */
       .brand {
         margin-left: 54px;
         min-height: 42px;
@@ -730,6 +725,23 @@
     let activities = JSON.parse(localStorage.getItem('hidrobit_activities')) || [];
     let selectedTaskId = null;
 
+    // Cargar tareas desde tasks.json si no hay tareas almacenadas en la sesión o al iniciar
+    async function loadTasksFromJson() {
+      try {
+        const response = await fetch('tasks.json');
+        if (response.ok) {
+          const jsonTasks = await response.json();
+          if (!localStorage.getItem('hidrobit_tasks') || tasks.length === 0) {
+            tasks = jsonTasks;
+            localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
+          }
+        }
+      } catch (error) {
+        console.warn('No se pudo cargar tasks.json local, usando caché local.', error);
+      }
+      render();
+    }
+
     function render() {
       renderMetrics();
       renderTasks();
@@ -977,7 +989,7 @@
       }
     }
 
-    render();
+    loadTasksFromJson();
   </script>
 </body>
 </html>
