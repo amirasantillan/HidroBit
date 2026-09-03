@@ -81,7 +81,7 @@
       display: block;
     }
 
-    /* Layout Barra Lateral (Escritorio) */
+    /* Layout Barra Lateral */
     .sidebar {
       width: 250px;
       background: #ffffff;
@@ -101,6 +101,7 @@
       font-size: 22px;
       font-weight: 700;
       color: var(--primary-dark);
+      transition: margin-left 0.3s ease;
     }
 
     .brand img {
@@ -139,7 +140,7 @@
       width: 100%;
     }
 
-    /* Modificaciones específicas para pantallas pequeñas / móviles */
+    /* Adaptación para móviles */
     @media (max-width: 768px) {
       .menu-toggle {
         display: flex;
@@ -153,10 +154,16 @@
         z-index: 999;
         transform: translateX(-100%);
         box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+        padding-top: 16px;
       }
 
       .sidebar.active {
         transform: translateX(0);
+      }
+
+      /* Desplaza el logo a la derecha del botón de hamburguesa para no pisarse */
+      .brand {
+        margin-left: 48px; 
       }
 
       .main-content {
