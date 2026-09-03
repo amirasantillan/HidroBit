@@ -101,7 +101,7 @@
       font-size: 22px;
       font-weight: 700;
       color: var(--primary-dark);
-      transition: margin-left 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .brand img {
@@ -154,16 +154,17 @@
         z-index: 999;
         transform: translateX(-100%);
         box-shadow: 2px 0 12px rgba(0,0,0,0.15);
-        padding-top: 16px;
+        padding: 12px 24px 24px 24px;
       }
 
       .sidebar.active {
         transform: translateX(0);
       }
 
-      /* Desplaza el logo a la derecha del botón de hamburguesa para no pisarse */
+      /* Alinea el logo y el texto a la derecha del botón en móvil */
       .brand {
-        margin-left: 48px; 
+        margin-left: 54px;
+        min-height: 42px;
       }
 
       .main-content {
