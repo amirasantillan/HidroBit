@@ -725,19 +725,18 @@
     let activities = JSON.parse(localStorage.getItem('hidrobit_activities')) || [];
     let selectedTaskId = null;
 
-    // Cargar tareas desde tasks.json si no hay tareas almacenadas en la sesión o al iniciar
+    // Cargar tareas desde tasks.json forzando actualización sin caché
     async function loadTasksFromJson() {
       try {
-        const response = await fetch('tasks.json');
+        // Agregamos ?v=Date.now() para evitar que el celular guarde caché viejo
+        const response = await fetch('tasks.json?v=' + Date.now());
         if (response.ok) {
           const jsonTasks = await response.json();
-          if (!localStorage.getItem('hidrobit_tasks') || tasks.length === 0) {
-            tasks = jsonTasks;
-            localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
-          }
+          tasks = jsonTasks;
+          localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
         }
       } catch (error) {
-        console.warn('No se pudo cargar tasks.json local, usando caché local.', error);
+        console.warn('No se pudo cargar tasks.json, usando almacenamiento local.', error);
       }
       render();
     }
