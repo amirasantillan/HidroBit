@@ -215,6 +215,25 @@
       background: var(--primary-dark);
     }
 
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
     .view-section {
       display: none;
       animation: fadeIn 0.3s ease;
@@ -477,6 +496,15 @@
       white-space: nowrap;
       text-overflow: ellipsis;
     }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
   </style>
 </head>
 <body>
@@ -651,7 +679,7 @@
     </div>
   </div>
 
-  <!-- Modal Detalle y Comentarios -->
+  <!-- Modal Detalle, Comentarios y Eliminar -->
   <div class="modal" id="detailModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -679,6 +707,10 @@
             <button class="btn-primary" onclick="addComment()" style="padding: 6px 12px;">Enviar</button>
           </div>
         </div>
+
+        <div class="modal-actions" id="modalActions">
+          <button class="btn-danger" id="btnDeleteTask" onclick="deleteTask()">🗑️ Eliminar tarea</button>
+        </div>
       </div>
     </div>
   </div>
@@ -703,6 +735,7 @@
       document.getElementById('btnNewTask').style.display = 'none';
       document.getElementById('commentInputGroup').style.display = 'none';
       document.getElementById('dStatusSelect').disabled = true;
+      document.getElementById('btnDeleteTask').style.display = 'none';
     } else {
       document.getElementById('calendarMonthPicker').style.display = 'block';
     }
@@ -939,6 +972,17 @@
     }
 
     function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); }
+
+    function deleteTask() {
+      if (!isAdmin || !selectedTaskId) return;
+      const task = tasks.find(t => t.id === selectedTaskId);
+      if (task && confirm(`¿Estás segura de eliminar la tarea "${task.text}"?`)) {
+        tasks = tasks.filter(t => t.id !== selectedTaskId);
+        addActivity(`Se eliminó la tarea <strong>${task.text}</strong>`);
+        saveAndRender();
+        closeDetailModal();
+      }
+    }
 
     function renderComments(task) {
       const cList = document.getElementById('commentsList');
