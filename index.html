@@ -684,6 +684,10 @@
   </div>
 
   <script>
+    // URL de Firebase Realtime Database
+    const FIREBASE_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/tasks.json';
+    const FIREBASE_ACTIVITIES_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/activities.json';
+
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('sidebarOverlay');
@@ -725,18 +729,35 @@
     let activities = JSON.parse(localStorage.getItem('hidrobit_activities')) || [];
     let selectedTaskId = null;
 
-    // Cargar tareas desde tasks.json forzando actualización sin caché
+    // Cargar tareas e historial desde Firebase
     async function loadTasksFromJson() {
       try {
-        // Agregamos ?v=Date.now() para evitar que el celular guarde caché viejo
-        const response = await fetch('tasks.json?v=' + Date.now());
-        if (response.ok) {
-          const jsonTasks = await response.json();
-          tasks = jsonTasks;
+        const [resTasks, resActivities] = await Promise.all([
+          fetch(FIREBASE_URL),
+          fetch(FIREBASE_ACTIVITIES_URL)
+        ]);
+
+        if (resTasks.ok) {
+          const jsonTasks = await resTasks.json();
+          if (jsonTasks) {
+            tasks = Array.isArray(jsonTasks) ? jsonTasks : Object.values(jsonTasks);
+          } else {
+            tasks = [];
+          }
           localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
         }
+
+        if (resActivities.ok) {
+          const jsonActivities = await resActivities.json();
+          if (jsonActivities) {
+            activities = Array.isArray(jsonActivities) ? jsonActivities : Object.values(jsonActivities);
+          } else {
+            activities = [];
+          }
+          localStorage.setItem('hidrobit_activities', JSON.stringify(activities));
+        }
       } catch (error) {
-        console.warn('No se pudo cargar tasks.json, usando almacenamiento local.', error);
+        console.warn('Error al cargar desde Firebase, usando respaldo local:', error);
       }
       render();
     }
@@ -748,11 +769,29 @@
       renderActivities();
     }
 
-    function saveAndRender() {
+    // Guardar tareas y actividades en Firebase
+    async function saveAndRender() {
       localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
       localStorage.setItem('hidrobit_activities', JSON.stringify(activities));
       render();
       if(document.getElementById('calendarSection').classList.contains('active')) renderCalendar();
+
+      try {
+        await Promise.all([
+          fetch(FIREBASE_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(tasks)
+          }),
+          fetch(FIREBASE_ACTIVITIES_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(activities)
+          })
+        ]);
+      } catch (error) {
+        console.error('Error al sincronizar con Firebase:', error);
+      }
     }
 
     function getDateWarning(dateStr, status) {
