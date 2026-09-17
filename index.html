@@ -499,7 +499,7 @@
 
     .modal-actions {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       margin-top: 20px;
       padding-top: 16px;
@@ -606,7 +606,7 @@
       <div class="section-card">
         <div class="calendar-controls">
           <h3 id="calendarDisplayMonth" style="margin: 0; min-width: 180px;">Mes</h3>
-          <input type="month" id="calendarMonthPicker" onchange="changeCalendarMonth(event)" style="display: none;">
+          <input type="month" id="calendarMonthPicker" onchange="changeCalendarMonth(event)">
         </div>
         
         <div class="calendar-grid">
@@ -727,18 +727,7 @@
       overlay.classList.toggle('active');
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const isAdmin = urlParams.get('admin') === 'true';
     const teamMembers = ["Amira", "Joaquín", "Nacho", "Felipe", "Agustín"];
-
-    if (!isAdmin) {
-      document.getElementById('btnNewTask').style.display = 'none';
-      document.getElementById('commentInputGroup').style.display = 'none';
-      document.getElementById('dStatusSelect').disabled = true;
-      document.getElementById('btnDeleteTask').style.display = 'none';
-    } else {
-      document.getElementById('calendarMonthPicker').style.display = 'block';
-    }
 
     const today = new Date();
     let selectedCalendarMonth = localStorage.getItem('hidrobit_cal_month') || `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
@@ -974,7 +963,7 @@
     function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); }
 
     function deleteTask() {
-      if (!isAdmin || !selectedTaskId) return;
+      if (!selectedTaskId) return;
       const task = tasks.find(t => t.id === selectedTaskId);
       if (task && confirm(`¿Estás segura de eliminar la tarea "${task.text}"?`)) {
         tasks = tasks.filter(t => t.id !== selectedTaskId);
@@ -1010,7 +999,7 @@
     }
 
     function updateTaskStatusFromModal() {
-      if (!isAdmin || !selectedTaskId) return;
+      if (!selectedTaskId) return;
       const newStatus = document.getElementById('dStatusSelect').value;
       const task = tasks.find(t => t.id === selectedTaskId);
       if (task) {
