@@ -522,6 +522,10 @@
       padding-top: 16px;
       border-top: 1px solid var(--border);
     }
+
+    .admin-only {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -556,7 +560,7 @@
         <h1>Gestión del Equipo</h1>
         <p>Organizá, asigná y seguí el progreso de todas las tareas.</p>
       </div>
-      <button id="btnNewTask" class="btn-primary" onclick="openTaskModal()">＋ Nueva tarea</button>
+      <button id="btnNewTask" class="btn-primary admin-only" onclick="openTaskModal()">＋ Nueva tarea</button>
     </header>
 
     <!-- VISTA INICIO -->
@@ -570,7 +574,7 @@
       <div class="section-card">
         <div class="section-header">
           <h3>Actividad Reciente</h3>
-          <button class="btn-clear" onclick="clearActivities()">🗑️ Limpiar historial</button>
+          <button id="btnClearActivities" class="btn-clear admin-only" onclick="clearActivities()">🗑️ Limpiar historial</button>
         </div>
         <ul class="activity-list" id="activityList"></ul>
       </div>
@@ -713,9 +717,6 @@
         <p style="font-size: 13px; color: var(--text-muted);"><strong>Prioridad:</strong> <span id="dPriority"></span></p>
         <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Estado:</strong> 
           <select id="dStatusSelect" onchange="updateTaskStatusFromModal()" style="margin-left: 6px; padding: 4px;">
-            <option value="Pendiente">Pendiente</option>
-            <option value="En progreso">En progreso</option>
-            <option value="Completada">Completada</option>
           </select>
         </p>
 
@@ -729,7 +730,7 @@
         </div>
 
         <div class="modal-actions" id="modalActions">
-          <button class="btn-danger" id="btnDeleteTask" onclick="deleteTask()">🗑️ Eliminar tarea</button>
+          <button class="btn-danger admin-only" id="btnDeleteTask" onclick="deleteTask()">🗑️ Eliminar tarea</button>
         </div>
       </div>
     </div>
@@ -738,6 +739,16 @@
   <script>
     const FIREBASE_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/tasks.json';
     const FIREBASE_ACTIVITIES_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/activities.json';
+
+    // Verificación del parámetro ?admin=true
+    const urlParams = new URLSearchParams(window.location.search);
+    const isAdmin = urlParams.get('admin') === 'true';
+
+    function checkAdminPermissions() {
+      if (isAdmin) {
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-only'));
+      }
+    }
 
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
@@ -795,6 +806,7 @@
     }
 
     function render() {
+      checkAdminPermissions();
       renderMetrics();
       renderTasks();
       renderProgress();
@@ -937,17 +949,21 @@
     }
 
     function clearActivities() {
+      if (!isAdmin) return;
       if (confirm("¿Estás segura de borrar todo el historial de actividad reciente?")) {
         activities = [];
         saveAndRender();
       }
     }
 
-    function openTaskModal() { document.getElementById('taskModal').classList.add('active'); }
+    function openTaskModal() { 
+      if (isAdmin) document.getElementById('taskModal').classList.add('active'); 
+    }
     function closeTaskModal() { document.getElementById('taskModal').classList.remove('active'); }
 
     document.getElementById('taskForm').addEventListener('submit', (e) => {
       e.preventDefault();
+      if (!isAdmin) return;
       const newTask = {
         id: Date.now(),
         text: document.getElementById('taskName').value,
@@ -974,15 +990,39 @@
       document.getElementById('dMember').innerText = task.member;
       document.getElementById('dDate').innerText = task.date;
       document.getElementById('dPriority').innerText = task.priority;
-      document.getElementById('dStatusSelect').value = task.status;
+      
+      const statusSelect = document.getElementById('dStatusSelect');
+      statusSelect.innerHTML = '';
+
+      if (isAdmin) {
+        statusSelect.innerHTML = `
+          <option value="Pendiente" ${task.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+          <option value="En progreso" ${task.status === 'En progreso' ? 'selected' : ''}>En progreso</option>
+          <option value="Completada" ${task.status === 'Completada' ? 'selected' : ''}>Completada</option>
+        `;
+        statusSelect.disabled = false;
+      } else {
+        if (task.status === 'Completada') {
+          statusSelect.innerHTML = `<option value="Completada" selected>Completada</option>`;
+          statusSelect.disabled = true;
+        } else {
+          statusSelect.innerHTML = `
+            <option value="${task.status}" selected>${task.status}</option>
+            <option value="Completada">Completada</option>
+          `;
+          statusSelect.disabled = false;
+        }
+      }
+
       renderComments(task);
+      checkAdminPermissions();
       document.getElementById('detailModal').classList.add('active');
     }
 
     function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); }
 
     function deleteTask() {
-      if (!selectedTaskId) return;
+      if (!isAdmin || !selectedTaskId) return;
       const task = tasks.find(t => t.id === selectedTaskId);
       if (task && confirm(`¿Estás segura de eliminar la tarea "${task.text}"?`)) {
         tasks = tasks.filter(t => t.id !== selectedTaskId);
@@ -1010,7 +1050,7 @@
       const task = tasks.find(t => t.id === selectedTaskId);
       if (task) {
         if (!task.comments) task.comments = [];
-        task.comments.push({ user: "Amira", text: textInput.value });
+        task.comments.push({ user: isAdmin ? "Admin" : "Integrante", text: textInput.value });
         textInput.value = '';
         saveAndRender();
         renderComments(task);
