@@ -234,6 +234,23 @@
       background: #dc2626;
     }
 
+    .btn-clear {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-clear:hover {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+
     .view-section {
       display: none;
       animation: fadeIn 0.3s ease;
@@ -551,7 +568,10 @@
         <div class="metric-card"><span>Vencidas</span><h2 id="mOverdue" style="color: var(--status-overdue-text);">0</h2></div>
       </div>
       <div class="section-card">
-        <h3>Actividad Reciente</h3>
+        <div class="section-header">
+          <h3>Actividad Reciente</h3>
+          <button class="btn-clear" onclick="clearActivities()">🗑️ Limpiar historial</button>
+        </div>
         <ul class="activity-list" id="activityList"></ul>
       </div>
     </section>
@@ -716,7 +736,6 @@
   </div>
 
   <script>
-    // URL de Firebase Realtime Database
     const FIREBASE_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/tasks.json';
     const FIREBASE_ACTIVITIES_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/activities.json';
 
@@ -751,7 +770,6 @@
     let activities = JSON.parse(localStorage.getItem('hidrobit_activities')) || [];
     let selectedTaskId = null;
 
-    // Cargar tareas e historial desde Firebase
     async function loadTasksFromJson() {
       try {
         const [resTasks, resActivities] = await Promise.all([
@@ -761,25 +779,17 @@
 
         if (resTasks.ok) {
           const jsonTasks = await resTasks.json();
-          if (jsonTasks) {
-            tasks = Array.isArray(jsonTasks) ? jsonTasks : Object.values(jsonTasks);
-          } else {
-            tasks = [];
-          }
+          tasks = jsonTasks ? (Array.isArray(jsonTasks) ? jsonTasks : Object.values(jsonTasks)) : [];
           localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
         }
 
         if (resActivities.ok) {
           const jsonActivities = await resActivities.json();
-          if (jsonActivities) {
-            activities = Array.isArray(jsonActivities) ? jsonActivities : Object.values(jsonActivities);
-          } else {
-            activities = [];
-          }
+          activities = jsonActivities ? (Array.isArray(jsonActivities) ? jsonActivities : Object.values(jsonActivities)) : [];
           localStorage.setItem('hidrobit_activities', JSON.stringify(activities));
         }
       } catch (error) {
-        console.warn('Error al cargar desde Firebase, usando respaldo local:', error);
+        console.warn('Error al cargar desde Firebase:', error);
       }
       render();
     }
@@ -791,7 +801,6 @@
       renderActivities();
     }
 
-    // Guardar tareas y actividades en Firebase
     async function saveAndRender() {
       localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
       localStorage.setItem('hidrobit_activities', JSON.stringify(activities));
@@ -914,14 +923,24 @@
     function renderActivities() {
       const list = document.getElementById('activityList');
       list.innerHTML = '';
-      if(activities.length === 0) list.innerHTML = `<li class="activity-item">Sin actividad reciente.</li>`;
-      activities.slice(-6).reverse().forEach(act => {
+      if(activities.length === 0) {
+        list.innerHTML = `<li class="activity-item">Sin actividad reciente.</li>`;
+        return;
+      }
+      activities.slice(-10).reverse().forEach(act => {
         list.innerHTML += `<li class="activity-item">${act}</li>`;
       });
     }
 
     function addActivity(text) {
       activities.push(text);
+    }
+
+    function clearActivities() {
+      if (confirm("¿Estás segura de borrar todo el historial de actividad reciente?")) {
+        activities = [];
+        saveAndRender();
+      }
     }
 
     function openTaskModal() { document.getElementById('taskModal').classList.add('active'); }
