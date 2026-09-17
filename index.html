@@ -45,6 +45,11 @@
       overflow-x: hidden;
     }
 
+    /* Estilo para ocultar elementos administrativos */
+    .admin-only {
+      display: none !important;
+    }
+
     .menu-toggle {
       display: none;
       position: fixed;
@@ -522,10 +527,6 @@
       padding-top: 16px;
       border-top: 1px solid var(--border);
     }
-
-    .admin-only {
-      display: none !important;
-    }
   </style>
 </head>
 <body>
@@ -560,6 +561,7 @@
         <h1>Gestión del Equipo</h1>
         <p>Organizá, asigná y seguí el progreso de todas las tareas.</p>
       </div>
+      <!-- Botón Nueva Tarea restringido por clase admin-only -->
       <button id="btnNewTask" class="btn-primary admin-only" onclick="openTaskModal()">＋ Nueva tarea</button>
     </header>
 
@@ -740,7 +742,7 @@
     const FIREBASE_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/tasks.json';
     const FIREBASE_ACTIVITIES_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/activities.json';
 
-    // Verificación del parámetro ?admin=true
+    // Verificación de los permisos del administrador en la URL
     const urlParams = new URLSearchParams(window.location.search);
     const isAdmin = urlParams.get('admin') === 'true';
 
@@ -956,10 +958,15 @@
       }
     }
 
+    // Apertura resguardada únicamente para Administradores
     function openTaskModal() { 
-      if (isAdmin) document.getElementById('taskModal').classList.add('active'); 
+      if (!isAdmin) return; 
+      document.getElementById('taskModal').classList.add('active'); 
     }
-    function closeTaskModal() { document.getElementById('taskModal').classList.remove('active'); }
+    
+    function closeTaskModal() { 
+      document.getElementById('taskModal').classList.remove('active'); 
+    }
 
     document.getElementById('taskForm').addEventListener('submit', (e) => {
       e.preventDefault();
