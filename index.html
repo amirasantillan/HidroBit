@@ -1,300 +1,1132 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HidroBit - Folleto Interactivo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --logo-dark: #1E4D2B;
-            --logo-green: #3B7A57;
-            --logo-light: #8FBC8F;
-            --leaf-green: #A3E4D7;
-            --bg-color: #F4F9F4;
-            --white: #ffffff;
-            --text-dark: #1E4D2B;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HidroBit — Panel de Gestión del Equipo</title>
+  <style>
+    :root {
+      --bg: #f3f9f5;
+      --card: #ffffff;
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --primary-light: #d1fae5;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      --status-pending: #fef3c7;
+      --status-pending-text: #d97706;
+      --status-progress: #e0f2fe;
+      --status-progress-text: #0284c7;
+      --status-completed: #d1fae5;
+      --status-completed-text: #059669;
+      --status-overdue: #fee2e2;
+      --status-overdue-text: #dc2626;
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-        }
+      --priority-high: #ef4444;
+      --priority-medium: #f59e0b;
+      --priority-low: #10b981;
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
-        .phone-container {
-            width: 100%;
-            max-width: 480px;
-            background: var(--white);
-            border-radius: 35px;
-            box-shadow: 0 12px 35px rgba(30, 77, 43, 0.15);
-            overflow: hidden;
-            border: 5px solid var(--logo-dark);
-        }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
 
-        header {
-            background: linear-gradient(135deg, var(--logo-dark), var(--logo-green));
-            color: var(--white);
-            padding: 35px 20px 25px;
-            text-align: center;
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
-        }
+    /* Estilo para ocultar elementos administrativos */
+    .admin-only {
+      display: none !important;
+    }
 
-        .logo-placeholder {
-            width: 80px;
-            height: 90px;
-            margin: 0 auto 15px;
-            background: white;
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 1001;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 42px;
+      height: 42px;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      align-items: center;
+      justify-content: center;
+    }
 
-        .logo-placeholder span {
-            font-size: 2.2rem;
-        }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 998;
+    }
 
-        header h1 {
-            font-family: 'Quicksand', sans-serif;
-            font-size: 2.4rem;
-            margin-bottom: 5px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
+    .sidebar-overlay.active {
+      display: block;
+    }
 
-        header p {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 500;
-        }
+    .sidebar {
+      width: 250px;
+      background: #ffffff;
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
 
-        .section {
-            padding: 25px 20px;
-            border-bottom: 2px dashed #D5E8D4;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      transition: all 0.3s ease;
+    }
 
-        .section:last-child {
-            border-bottom: none;
-        }
+    .brand img {
+      width: 45px;
+      height: auto;
+    }
 
-        h2 {
-            font-family: 'Quicksand', sans-serif;
-            font-size: 1.35rem;
-            color: var(--logo-dark);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-        }
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-        p, li {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #2C3E50;
-        }
+    .nav-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
 
-        ul {
-            padding-left: 20px;
-            margin-top: 8px;
-        }
+    .nav-item:hover, .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
 
-        .card {
-            background: #EAF2EC;
-            border-left: 5px solid var(--logo-green);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
+    .main-content {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+      width: 100%;
+    }
 
-        .team-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 15px;
-        }
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: flex;
+      }
 
-        .team-member {
-            background: #F4F9F4;
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #D5E8D4;
-        }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 999;
+        transform: translateX(-100%);
+        box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+        padding: 12px 24px 24px 24px;
+      }
 
-        .team-member.leader {
-            grid-column: span 2;
-            background: #EAF2EC;
-            border-color: var(--logo-green);
-        }
+      .sidebar.active {
+        transform: translateX(0);
+      }
 
-        .team-member h3 {
-            font-size: 0.95rem;
-            color: var(--logo-dark);
-            font-weight: 700;
-        }
+      .brand {
+        margin-left: 54px;
+        min-height: 42px;
+      }
 
-        .team-member p {
-            font-size: 0.8rem;
-            color: #555;
-        }
+      .main-content {
+        padding: 16px;
+        padding-top: 64px;
+      }
 
-        .social-links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
 
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: var(--logo-dark);
-            color: white;
-            padding: 14px 20px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: background 0.3s;
-            box-shadow: 0 4px 10px rgba(30, 77, 43, 0.2);
-        }
+      .header button {
+        width: 100%;
+      }
+    }
 
-        .social-btn:hover {
-            background: var(--logo-green);
-        }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
 
-        .interactive-box {
-            background: #FFF9E6;
-            border: 2px solid #D4AC0D;
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            margin-top: 15px;
-        }
+    .welcome h1 {
+      font-size: 26px;
+      color: var(--text);
+    }
 
-        .interactive-box button {
-            background: #D4AC0D;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-        }
+    .welcome p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
 
-        .interactive-box button:hover {
-            background: #B7950B;
-        }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
 
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: var(--logo-dark);
-            color: white;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-    </style>
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-clear {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-clear:hover {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+
+    .view-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .metric-card span {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .metric-card h2 {
+      font-size: 28px;
+      margin-top: 6px;
+      color: var(--text);
+    }
+
+    .section-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    select, input, textarea {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .task-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .task-table th, .task-table td {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .task-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .task-row {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .task-row:hover {
+      background: #f8fafc;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .badge-pending { background: var(--status-pending); color: var(--status-pending-text); }
+    .badge-progress { background: var(--status-progress); color: var(--status-progress-text); }
+    .badge-completed { background: var(--status-completed); color: var(--status-completed-text); }
+    .badge-overdue { background: var(--status-overdue); color: var(--status-overdue-text); }
+
+    .priority-dot {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .p-alta { background: var(--priority-high); }
+    .p-media { background: var(--priority-medium); }
+    .p-baja { background: var(--priority-low); }
+
+    .date-warning {
+      font-size: 11px;
+      display: block;
+      margin-top: 2px;
+    }
+    .text-danger { color: var(--status-overdue-text); font-weight: 600; }
+    .text-warning { color: var(--status-pending-text); font-weight: 600; }
+
+    .progress-bar-container {
+      background: var(--bg);
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 12px 0 20px 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .member-progress-item { margin-bottom: 12px; }
+    .member-progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .activity-list { list-style: none; }
+    .activity-item {
+      font-size: 13px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .activity-item strong { color: var(--text); }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: white;
+      padding: 28px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .comments-section {
+      margin-top: 20px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .comment-box {
+      background: var(--bg);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+      margin-top: 12px;
+    }
+    .calendar-day-header {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--text-muted);
+    }
+    .calendar-day {
+      background: var(--bg);
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid transparent;
+    }
+    .calendar-day.empty { background: transparent; }
+    .calendar-day.today { border-color: var(--primary); background: var(--primary-light); }
+    
+    .calendar-event {
+      background: var(--card);
+      color: var(--primary-dark);
+      font-size: 10px;
+      padding: 4px;
+      border-radius: 4px;
+      margin-top: 4px;
+      width: 100%;
+      border: 1px solid var(--primary-light);
+      cursor: pointer;
+      text-align: left;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
 </head>
 <body>
 
-    <div class="phone-container">
-        <header>
-            <div class="logo-placeholder">
-                <span>🌱</span>
-            </div>
-            <h1>HidroBít</h1>
-            <p>Cultivando el futuro con tecnología</p>
-        </header>
+  <!-- Botón Flotante Menú Móvil -->
+  <button class="menu-toggle" id="menuToggleBtn" onclick="toggleSidebar()" aria-label="Abrir Menú">☰</button>
+  
+  <!-- Overlay Móvil -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <div class="section">
-            <h2>¿Qué es HidroBit?</h2>
-            <p>Es un sistema hidropónico inteligente diseñado con tecnología y sensores para monitorear y optimizar automáticamente el crecimiento de las plantas en cualquier espacio.</p>
-        </div>
-
-        <div class="section">
-            <h2>¿Por qué Hidroponía?</h2>
-            <div class="card">
-                <ul>
-                    <li><strong>Menor uso de agua:</strong> Aprovecha el recurso hídrico de manera sumamente eficiente mediante recirculación en circuito.</li>
-                    <li><strong>Sin tierra:</strong> Las plantas reciben los nutrientes que necesitan de forma directa a través del agua.</li>
-                    <li><strong>Optimización de espacio:</strong> Permite cultivar en lugares pequeños (como balcones, cocinas o escuelas) usando una disposición en zig-zag.</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Beneficios y Usos</h2>
-            <p><strong>🏠 Para el hogar:</strong> Cultiva tus propios vegetales frescos directo en la cocina o balcón.</p>
-            <p style="margin-top: 8px;"><strong>📚 Para la educación:</strong> Excelente herramienta para aprender sobre botánica, ecología y programación.</p>
-            <p style="margin-top: 8px;"><strong>♻️ Sostenibilidad:</strong> Reducción de la huella de carbono y uso eficiente de los recursos.</p>
-        </div>
-
-        <div class="section">
-            <h2>👥 Nuestro Equipo (GELMS)</h2>
-            <div class="team-grid">
-                <div class="team-member leader">
-                    <h3>Amira Santillan</h3>
-                    <p>Líder del Proyecto</p>
-                </div>
-                <div class="team-member">
-                    <h3>Joaquín León</h3>
-                    <p>Electrónica / Robótica</p>
-                </div>
-                <div class="team-member">
-                    <h3>Felipe Fernández</h3>
-                    <p>Programación</p>
-                </div>
-                <div class="team-member">
-                    <h3>Ignacio Martín</h3>
-                    <p>Comunicación / Finanzas</p>
-                </div>
-                <div class="team-member">
-                    <h3>Agustín Galdame</h3>
-                    <p>Diseño / Marketing</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>¡Probá esto! 🎮</h2>
-            <div class="interactive-box">
-                <p>¿Querés saber cuánta agua ahorra HidroBit frente a la agricultura tradicional?</p>
-                <button onclick="alert('¡Hasta un 90% menos de agua! 💧🌱 En una huerta tradicional se absorbe o evapora mucha más agua, mientras que HidroBit la reutiliza en circuito.')">¡Descubrir dato!</button>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Red social</h2>
-            <div class="social-links">
-                <a href="https://instagram.com/hidrobit.724" target="_blank" class="social-btn">
-                    📸 Instagram: @hidrobit.724
-                </a>
-            </div>
-        </div>
-
-        <footer>
-            E.S.E.T.P. N° 724 • Trelew, Chubut
-        </footer>
+  <!-- Barra Lateral -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="63915-removebg-preview.png" alt="HidroBit Logo">
+      <span>HidroBit</span>
     </div>
 
+    <ul class="nav-list">
+      <li class="nav-item active" onclick="switchTab('inicioSection', this)">📊 Inicio</li>
+      <li class="nav-item" onclick="switchTab('tasksSection', this)">📋 Tareas</li>
+      <li class="nav-item" onclick="switchTab('teamSection', this)">👥 Equipo</li>
+      <li class="nav-item" onclick="switchTab('calendarSection', this)">📅 Calendario</li>
+    </ul>
+  </aside>
+
+  <!-- Contenido Principal -->
+  <main class="main-content">
+    
+    <!-- Encabezado -->
+    <header class="header">
+      <div class="welcome">
+        <h1>Gestión del Equipo</h1>
+        <p>Organizá, asigná y seguí el progreso de todas las tareas.</p>
+      </div>
+      <!-- Botón Nueva Tarea restringido por clase admin-only -->
+      <button id="btnNewTask" class="btn-primary admin-only" onclick="openTaskModal()">＋ Nueva tarea</button>
+    </header>
+
+    <!-- VISTA INICIO -->
+    <section id="inicioSection" class="view-section active">
+      <div class="metrics-grid">
+        <div class="metric-card"><span>Tareas Totales</span><h2 id="mTotal">0</h2></div>
+        <div class="metric-card"><span>Pendientes</span><h2 id="mPending">0</h2></div>
+        <div class="metric-card"><span>Completadas</span><h2 id="mCompleted">0</h2></div>
+        <div class="metric-card"><span>Vencidas</span><h2 id="mOverdue" style="color: var(--status-overdue-text);">0</h2></div>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Actividad Reciente</h3>
+          <button id="btnClearActivities" class="btn-clear admin-only" onclick="clearActivities()">🗑️ Limpiar historial</button>
+        </div>
+        <ul class="activity-list" id="activityList"></ul>
+      </div>
+    </section>
+
+    <!-- VISTA TAREAS -->
+    <section id="tasksSection" class="view-section">
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Lista de Tareas</h3>
+          <div class="filter-group">
+            <label for="memberFilter">Mostrar de:</label>
+            <select id="memberFilter" onchange="renderTasks()">
+              <option value="Todos">Todos</option>
+              <option value="Amira">Amira</option>
+              <option value="Joaquín">Joaquín</option>
+              <option value="Nacho">Nacho</option>
+              <option value="Felipe">Felipe</option>
+              <option value="Agustín">Agustín</option>
+            </select>
+          </div>
+        </div>
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th>Tarea</th>
+              <th>Integrante</th>
+              <th>Entrega</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="taskTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VISTA EQUIPO -->
+    <section id="teamSection" class="view-section">
+      <div class="section-card">
+        <h3>Progreso General</h3>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="overallProgressBar"></div>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;" id="overallProgressText">0% completado</p>
+
+        <h4 style="font-size: 16px; margin-bottom: 16px;">Progreso por Integrante:</h4>
+        <div id="membersProgressList"></div>
+      </div>
+    </section>
+
+    <!-- VISTA CALENDARIO -->
+    <section id="calendarSection" class="view-section">
+      <div class="section-card">
+        <div class="calendar-controls">
+          <h3 id="calendarDisplayMonth" style="margin: 0; min-width: 180px;">Mes</h3>
+          <input type="month" id="calendarMonthPicker" onchange="changeCalendarMonth(event)">
+        </div>
+        
+        <div class="calendar-grid">
+          <div class="calendar-day-header">Dom</div>
+          <div class="calendar-day-header">Lun</div>
+          <div class="calendar-day-header">Mar</div>
+          <div class="calendar-day-header">Mié</div>
+          <div class="calendar-day-header">Jue</div>
+          <div class="calendar-day-header">Vie</div>
+          <div class="calendar-day-header">Sáb</div>
+        </div>
+        <div class="calendar-grid" id="calendarDays"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Crear Tarea -->
+  <div class="modal" id="taskModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Nueva Tarea</h3>
+        <button onclick="closeTaskModal()" style="border:none; background:none; cursor:pointer; font-size:18px;">✕</button>
+      </div>
+      <form id="taskForm">
+        <div class="form-group">
+          <label>Nombre de la tarea</label>
+          <input type="text" id="taskName" required placeholder="Ej. Diseñar prototipo">
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="taskDesc" rows="2" placeholder="Detalles de la tarea..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Asignar a</label>
+            <select id="taskMember">
+              <option value="Amira">Amira</option>
+              <option value="Joaquín">Joaquín</option>
+              <option value="Nacho">Nacho</option>
+              <option value="Felipe">Felipe</option>
+              <option value="Agustín">Agustín</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Fecha de entrega</label>
+            <input type="date" id="taskDate" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Prioridad</label>
+            <select id="taskPriority">
+              <option value="Baja">Baja</option>
+              <option value="Media">Media</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Estado</label>
+            <select id="taskStatus">
+              <option value="Pendiente">Pendiente</option>
+              <option value="En progreso">En progreso</option>
+              <option value="Completada">Completada</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 12px;">Guardar Tarea</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Detalle, Comentarios y Eliminar -->
+  <div class="modal" id="detailModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="dTitle">Detalle de la Tarea</h3>
+        <button onclick="closeDetailModal()" style="border:none; background:none; cursor:pointer; font-size:18px;">✕</button>
+      </div>
+      <div>
+        <p style="font-size: 14px; margin-bottom: 8px;" id="dDesc"></p>
+        <p style="font-size: 13px; color: var(--text-muted);"><strong>Responsable:</strong> <span id="dMember"></span></p>
+        <p style="font-size: 13px; color: var(--text-muted);"><strong>Entrega:</strong> <span id="dDate"></span></p>
+        <p style="font-size: 13px; color: var(--text-muted);"><strong>Prioridad:</strong> <span id="dPriority"></span></p>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Estado:</strong> 
+          <select id="dStatusSelect" onchange="updateTaskStatusFromModal()" style="margin-left: 6px; padding: 4px;">
+          </select>
+        </p>
+
+        <div class="comments-section">
+          <h4 style="font-size: 14px; margin-bottom: 10px;">Comentarios</h4>
+          <div id="commentsList"></div>
+          <div id="commentInputGroup" style="display: flex; gap: 8px; margin-top: 10px;">
+            <input type="text" id="newCommentText" placeholder="Escribí un comentario..." style="flex: 1;">
+            <button class="btn-primary" onclick="addComment()" style="padding: 6px 12px;">Enviar</button>
+          </div>
+        </div>
+
+        <div class="modal-actions" id="modalActions">
+          <button class="btn-danger admin-only" id="btnDeleteTask" onclick="deleteTask()">🗑️ Eliminar tarea</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const FIREBASE_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/tasks.json';
+    const FIREBASE_ACTIVITIES_URL = 'https://hidrobit-c7311-default-rtdb.firebaseio.com/activities.json';
+
+    // Verificación de los permisos del administrador en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const isAdmin = urlParams.get('admin') === 'true';
+
+    function checkAdminPermissions() {
+      if (isAdmin) {
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-only'));
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+
+    const teamMembers = ["Amira", "Joaquín", "Nacho", "Felipe", "Agustín"];
+
+    const today = new Date();
+    let selectedCalendarMonth = localStorage.getItem('hidrobit_cal_month') || `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+    document.getElementById('calendarMonthPicker').value = selectedCalendarMonth;
+
+    function switchTab(sectionId, element) {
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      element.classList.add('active');
+      
+      if(sectionId === 'calendarSection') renderCalendar();
+
+      if (window.innerWidth <= 768) {
+        toggleSidebar();
+      }
+    }
+
+    let tasks = JSON.parse(localStorage.getItem('hidrobit_tasks')) || [];
+    let activities = JSON.parse(localStorage.getItem('hidrobit_activities')) || [];
+    let selectedTaskId = null;
+
+    async function loadTasksFromJson() {
+      try {
+        const [resTasks, resActivities] = await Promise.all([
+          fetch(FIREBASE_URL),
+          fetch(FIREBASE_ACTIVITIES_URL)
+        ]);
+
+        if (resTasks.ok) {
+          const jsonTasks = await resTasks.json();
+          tasks = jsonTasks ? (Array.isArray(jsonTasks) ? jsonTasks : Object.values(jsonTasks)) : [];
+          localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
+        }
+
+        if (resActivities.ok) {
+          const jsonActivities = await resActivities.json();
+          activities = jsonActivities ? (Array.isArray(jsonActivities) ? jsonActivities : Object.values(jsonActivities)) : [];
+          localStorage.setItem('hidrobit_activities', JSON.stringify(activities));
+        }
+      } catch (error) {
+        console.warn('Error al cargar desde Firebase:', error);
+      }
+      render();
+    }
+
+    function render() {
+      checkAdminPermissions();
+      renderMetrics();
+      renderTasks();
+      renderProgress();
+      renderActivities();
+    }
+
+    async function saveAndRender() {
+      localStorage.setItem('hidrobit_tasks', JSON.stringify(tasks));
+      localStorage.setItem('hidrobit_activities', JSON.stringify(activities));
+      render();
+      if(document.getElementById('calendarSection').classList.contains('active')) renderCalendar();
+
+      try {
+        await Promise.all([
+          fetch(FIREBASE_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(tasks)
+          }),
+          fetch(FIREBASE_ACTIVITIES_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(activities)
+          })
+        ]);
+      } catch (error) {
+        console.error('Error al sincronizar con Firebase:', error);
+      }
+    }
+
+    function getDateWarning(dateStr, status) {
+      if (status === "Completada") return "";
+      const dToday = new Date();
+      dToday.setHours(0,0,0,0);
+      const targetDate = new Date(dateStr + "T00:00:00");
+      const diffDays = Math.ceil((targetDate - dToday) / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) return `<span class="date-warning text-danger">⚠️ Vencida</span>`;
+      if (diffDays === 0) return `<span class="date-warning text-danger">⚠️ Vence hoy</span>`;
+      if (diffDays <= 3) return `<span class="date-warning text-warning">⏱️ Faltan ${diffDays} días</span>`;
+      return `<span class="date-warning" style="color:var(--text-muted)">Faltan más de 3 días</span>`;
+    }
+
+    function getCalculatedStatus(task) {
+      if (task.status === "Completada") return "Completada";
+      const dToday = new Date();
+      dToday.setHours(0,0,0,0);
+      const targetDate = new Date(task.date + "T00:00:00");
+      if (targetDate < dToday) return "Vencida";
+      return task.status;
+    }
+
+    function renderMetrics() {
+      const total = tasks.length;
+      let pending = 0, completed = 0, overdue = 0;
+      tasks.forEach(t => {
+        const st = getCalculatedStatus(t);
+        if (st === "Completada") completed++;
+        else if (st === "Vencida") overdue++;
+        else pending++;
+      });
+      document.getElementById('mTotal').innerText = total;
+      document.getElementById('mPending').innerText = pending;
+      document.getElementById('mCompleted').innerText = completed;
+      document.getElementById('mOverdue').innerText = overdue;
+    }
+
+    function renderTasks() {
+      const tbody = document.getElementById('taskTableBody');
+      const filter = document.getElementById('memberFilter').value;
+      tbody.innerHTML = '';
+      const filteredTasks = filter === "Todos" ? tasks : tasks.filter(t => t.member === filter);
+
+      filteredTasks.forEach(task => {
+        const currentStatus = getCalculatedStatus(task);
+        const tr = document.createElement('tr');
+        tr.className = "task-row";
+        tr.onclick = () => openDetailModal(task.id);
+
+        let badgeClass = "badge-pending";
+        if (currentStatus === "En progreso") badgeClass = "badge-progress";
+        if (currentStatus === "Completada") badgeClass = "badge-completed";
+        if (currentStatus === "Vencida") badgeClass = "badge-overdue";
+
+        let priorityClass = task.priority === "Alta" ? "p-alta" : (task.priority === "Media" ? "p-media" : "p-baja");
+
+        tr.innerHTML = `
+          <td><span class="priority-dot ${priorityClass}"></span><strong>${task.text}</strong></td>
+          <td>${task.member}</td>
+          <td>${task.date.split('-').reverse().slice(0,2).join('/')} ${getDateWarning(task.date, currentStatus)}</td>
+          <td><span class="badge ${badgeClass}">${currentStatus}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderProgress() {
+      const completedCount = tasks.filter(t => t.status === "Completada").length;
+      const totalCount = tasks.length;
+      const overallPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+      document.getElementById('overallProgressBar').style.width = `${overallPercent}%`;
+      document.getElementById('overallProgressText').innerText = `${overallPercent}% completado del total`;
+
+      const container = document.getElementById('membersProgressList');
+      container.innerHTML = '';
+
+      teamMembers.forEach(m => {
+        const mTasks = tasks.filter(t => t.member === m);
+        const mDone = mTasks.filter(t => t.status === "Completada").length;
+        const percent = mTasks.length > 0 ? Math.round((mDone / mTasks.length) * 100) : 0;
+
+        container.innerHTML += `
+          <div class="member-progress-item">
+            <div class="member-progress-info">
+              <span>${m}</span><strong>${percent}%</strong>
+            </div>
+            <div class="progress-bar-container" style="height:6px; margin:0;">
+              <div class="progress-bar" style="width: ${percent}%;"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderActivities() {
+      const list = document.getElementById('activityList');
+      list.innerHTML = '';
+      if(activities.length === 0) {
+        list.innerHTML = `<li class="activity-item">Sin actividad reciente.</li>`;
+        return;
+      }
+      activities.slice(-10).reverse().forEach(act => {
+        list.innerHTML += `<li class="activity-item">${act}</li>`;
+      });
+    }
+
+    function addActivity(text) {
+      activities.push(text);
+    }
+
+    function clearActivities() {
+      if (!isAdmin) return;
+      if (confirm("¿Estás segura de borrar todo el historial de actividad reciente?")) {
+        activities = [];
+        saveAndRender();
+      }
+    }
+
+    // Apertura resguardada únicamente para Administradores
+    function openTaskModal() { 
+      if (!isAdmin) return; 
+      document.getElementById('taskModal').classList.add('active'); 
+    }
+    
+    function closeTaskModal() { 
+      document.getElementById('taskModal').classList.remove('active'); 
+    }
+
+    document.getElementById('taskForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!isAdmin) return;
+      const newTask = {
+        id: Date.now(),
+        text: document.getElementById('taskName').value,
+        desc: document.getElementById('taskDesc').value,
+        member: document.getElementById('taskMember').value,
+        date: document.getElementById('taskDate').value,
+        priority: document.getElementById('taskPriority').value,
+        status: document.getElementById('taskStatus').value,
+        comments: []
+      };
+      tasks.push(newTask);
+      addActivity(`Se asignó <strong>${newTask.text}</strong> a ${newTask.member}`);
+      saveAndRender();
+      closeTaskModal();
+      document.getElementById('taskForm').reset();
+    });
+
+    function openDetailModal(id) {
+      selectedTaskId = id;
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      document.getElementById('dTitle').innerText = task.text;
+      document.getElementById('dDesc').innerText = task.desc || "Sin descripción.";
+      document.getElementById('dMember').innerText = task.member;
+      document.getElementById('dDate').innerText = task.date;
+      document.getElementById('dPriority').innerText = task.priority;
+      
+      const statusSelect = document.getElementById('dStatusSelect');
+      statusSelect.innerHTML = '';
+
+      if (isAdmin) {
+        statusSelect.innerHTML = `
+          <option value="Pendiente" ${task.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+          <option value="En progreso" ${task.status === 'En progreso' ? 'selected' : ''}>En progreso</option>
+          <option value="Completada" ${task.status === 'Completada' ? 'selected' : ''}>Completada</option>
+        `;
+        statusSelect.disabled = false;
+      } else {
+        if (task.status === 'Completada') {
+          statusSelect.innerHTML = `<option value="Completada" selected>Completada</option>`;
+          statusSelect.disabled = true;
+        } else {
+          statusSelect.innerHTML = `
+            <option value="${task.status}" selected>${task.status}</option>
+            <option value="Completada">Completada</option>
+          `;
+          statusSelect.disabled = false;
+        }
+      }
+
+      renderComments(task);
+      checkAdminPermissions();
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); }
+
+    function deleteTask() {
+      if (!isAdmin || !selectedTaskId) return;
+      const task = tasks.find(t => t.id === selectedTaskId);
+      if (task && confirm(`¿Estás segura de eliminar la tarea "${task.text}"?`)) {
+        tasks = tasks.filter(t => t.id !== selectedTaskId);
+        addActivity(`Se eliminó la tarea <strong>${task.text}</strong>`);
+        saveAndRender();
+        closeDetailModal();
+      }
+    }
+
+    function renderComments(task) {
+      const cList = document.getElementById('commentsList');
+      cList.innerHTML = '';
+      if (!task.comments || task.comments.length === 0) {
+        cList.innerHTML = `<p style="font-size:12px; color:var(--text-muted)">No hay comentarios aún.</p>`;
+        return;
+      }
+      task.comments.forEach(c => {
+        cList.innerHTML += `<div class="comment-box"><strong>${c.user}:</strong> ${c.text}</div>`;
+      });
+    }
+
+    function addComment() {
+      const textInput = document.getElementById('newCommentText');
+      if (!textInput.value.trim() || !selectedTaskId) return;
+      const task = tasks.find(t => t.id === selectedTaskId);
+      if (task) {
+        if (!task.comments) task.comments = [];
+        task.comments.push({ user: isAdmin ? "Admin" : "Integrante", text: textInput.value });
+        textInput.value = '';
+        saveAndRender();
+        renderComments(task);
+      }
+    }
+
+    function updateTaskStatusFromModal() {
+      if (!selectedTaskId) return;
+      const newStatus = document.getElementById('dStatusSelect').value;
+      const task = tasks.find(t => t.id === selectedTaskId);
+      if (task) {
+        task.status = newStatus;
+        addActivity(`Estado de <strong>${task.text}</strong> cambió a ${newStatus}`);
+        saveAndRender();
+      }
+    }
+
+    function changeCalendarMonth(e) {
+      selectedCalendarMonth = e.target.value;
+      localStorage.setItem('hidrobit_cal_month', selectedCalendarMonth);
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const [year, month] = selectedCalendarMonth.split('-');
+      const date = new Date(year, month - 1, 1);
+      
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      document.getElementById('calendarDisplayMonth').innerText = `${monthNames[date.getMonth()]} ${year}`;
+
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const firstDayIndex = date.getDay(); 
+
+      const calendarDays = document.getElementById('calendarDays');
+      calendarDays.innerHTML = '';
+
+      for (let i = 0; i < firstDayIndex; i++) {
+        calendarDays.innerHTML += `<div class="calendar-day empty"></div>`;
+      }
+
+      const dToday = new Date();
+      const isCurrentMonthYear = dToday.getFullYear() == year && (dToday.getMonth() + 1) == month;
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const dayStr = i < 10 ? `0${i}` : `${i}`;
+        const currentDateStr = `${year}-${month}-${dayStr}`;
+        const dayTasks = tasks.filter(t => t.date === currentDateStr);
+        
+        const isToday = isCurrentMonthYear && dToday.getDate() === i ? 'today' : '';
+
+        let tasksHtml = '';
+        dayTasks.forEach(t => {
+          let c = "var(--text-muted)";
+          if(t.status === 'Completada') c = "var(--status-completed-text)";
+          if(t.status === 'En progreso') c = "var(--status-progress-text)";
+          
+          tasksHtml += `<div class="calendar-event" onclick="openDetailModal(${t.id})" style="color: ${c}" title="${t.text}">${t.text}</div>`;
+        });
+
+        calendarDays.innerHTML += `
+          <div class="calendar-day ${isToday}">
+            <strong>${i}</strong>
+            ${tasksHtml}
+          </div>
+        `;
+      }
+    }
+
+    loadTasksFromJson();
+  </script>
 </body>
 </html>
